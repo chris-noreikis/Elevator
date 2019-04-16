@@ -1,0 +1,8 @@
+{
+  "floors": 20,
+  "elevators": 4,
+  "elevatorPersonCapacity": 15,
+  "elevatorSpeedInMilliseconds": 1000,
+  "doorOpenTime": 3000,
+  "returnToFirstFloorAfter": 60000
+}
