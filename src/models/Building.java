@@ -3,12 +3,12 @@ package models;
 import java.util.ArrayList;
 
 import gui.ElevatorDisplay;
-import reports.ActionReport;
 
 public class Building {
     private ArrayList<Floor> floors;
     private ArrayList<Elevator> elevators;
     public static boolean isUnitTest;
+
     public Building(String configurationFilePath) {
         try {
             BuildingConfigurable jo = new ElevatorJsonConfiguration(configurationFilePath);
@@ -35,8 +35,12 @@ public class Building {
     private void setupElevators(BuildingConfigurable buildingConfiguration) {
         elevators = new ArrayList<>();
         int numberOfElevators = buildingConfiguration.getNumberOfElevators();
+        int capacity = buildingConfiguration.getElevatorCapacity();
+        int elevatorSpeed = buildingConfiguration.getElevatorSpeedInMilliseconds();
+        int doorOpenTime = buildingConfiguration.getDoorOpenTime();
+        int returnToFirstFloor = buildingConfiguration.getReturnToFirstFloorAfter();
         for (int elevatorID = 1; elevatorID <= numberOfElevators; elevatorID++) {
-            elevators.add(new Elevator(elevatorID, this));
+            elevators.add(new Elevator(elevatorID, this, capacity, elevatorSpeed, doorOpenTime, returnToFirstFloor));
         }
     }
 
@@ -44,7 +48,9 @@ public class Building {
         return floors.size();
     }
 
-    public Floor getFloor(int floorNumberZeroIndexed) { return floors.get(floorNumberZeroIndexed); }
+    public Floor getFloor(int floorNumberZeroIndexed) {
+        return floors.get(floorNumberZeroIndexed);
+    }
 
     public int getNumberOfElevators() {
         return elevators.size();

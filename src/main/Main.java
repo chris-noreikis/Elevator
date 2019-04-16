@@ -19,7 +19,8 @@ public class Main {
     private static void testScenarioOne() throws InterruptedException {
         Building b = new Building("./configuration/json/20_floors_4_elevators.json");
         Elevator e = b.getElevator(1);
-        ElevatorDisplay.getInstance().shutdown();
+        e.addDestination(1);
+        e.debugState();
     }
 
 //        public static void main(String[] args) throws InterruptedException {
