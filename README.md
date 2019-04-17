@@ -7,3 +7,4 @@
 - [ ] Add way to log events like in the requirements document
 - [ ] Log events needed for part one
 - [ ] Floor movement algorithm in elevator
+- [ ] Person Class
