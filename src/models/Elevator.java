@@ -10,17 +10,24 @@ public class Elevator {
     private boolean isDoorOpen;
     private int currentFloor;
     private Building building;
-    private ArrayList<Integer> floors;
+    private ArrayList<ElevatorRequest> floorRequests;
+    private ArrayList<ElevatorRequest> riderRequests;
+    private ArrayList<Person> peopleOnElevator;
 
-    private enum ElevatorState {GOING_UP, GOING_DOWN, IDLE};
+    private enum ElevatorState {GOING_UP, GOING_DOWN, IDLE}
     private ElevatorState currentState;
     private Direction elevatorDirection;
     private int capacity;
     private int elevatorSpeedInMilliseconds;
     private int doorOpenTimeInMilliseconds;
     private int returnToFirstFloorAfter;
+    private int timeTilClose;
+    private int timeLeftOnFloor;
+    public int idleCount = 0;
+    public static final int floorTime = 1000;
+    public static final int doorTime = 2000;
 
-    public Elevator(int id, Building building, int capacity, int elevatorSpeedInMilliseconds, int doorOpenTimeInMilliseconds, int returnToFirstFloorAfter) {
+    public Elevator(int id, int capacity, int elevatorSpeedInMilliseconds, int doorOpenTimeInMilliseconds, int returnToFirstFloorAfter) {
         setIsDoorOpen(false);
         setCurrentFloor(1);
         setId(id);
@@ -30,38 +37,57 @@ public class Elevator {
         setDoorOpenTimeInMilliseconds(doorOpenTimeInMilliseconds);
         setReturnToFirstFloorAfter(returnToFirstFloorAfter);
         setState(ElevatorState.IDLE);
-        floors = new ArrayList<>();
+        floorRequests = new ArrayList<>();
+        peopleOnElevator = new ArrayList<>();
 
-        if (!Building.isUnitTest) {
-            ElevatorDisplay.getInstance().addElevator(id, 1);
-        }
+        ElevatorDisplay.getInstance().addElevator(id, 1);
 
         System.out.println(String.format("Elevator %s created ...", id));
     }
 
-    private void setState(ElevatorState e) { this.currentState = e; }
+    private void setState(ElevatorState e) {
+        this.currentState = e;
+    }
 
-    public ElevatorState getCurrentState() { return this.currentState; }
+    private ElevatorState getCurrentState() {
+        return this.currentState;
+    }
 
-    private void setBuilding (Building b) { this.building = b; }
+    private void setBuilding(Building b) {
+        this.building = b;
+    }
 
-    private ArrayList<Integer> getFloors() { return this.floors; }
+    private ArrayList<ElevatorRequest> getElevatorRequests() {
+        return this.floorRequests;
+    }
 
-    private void setId(int id) { this.id = id; }
+    private void setId(int id) {
+        this.id = id;
+    }
 
-    public int getID() {
+    private int getID() {
         return id;
     }
 
-    public boolean isDoorOpen() {
+    private boolean isDoorOpen() {
         return this.isDoorOpen;
     }
 
-    public void setIsDoorOpen(boolean nextValue) { this.isDoorOpen = nextValue; }
+    private void setIsDoorOpen(boolean nextValue) {
+        this.isDoorOpen = nextValue;
+    }
 
-    private int getCurrentFloor() { return currentFloor;  }
+    public void pickUpPassenger(Person p) {
+        this.peopleOnElevator.add(p);
+    }
 
-    private void setCurrentFloor (int currentFloor) { this.currentFloor = currentFloor; }
+    private int getCurrentFloor() {
+        return currentFloor;
+    }
+
+    private void setCurrentFloor(int currentFloor) {
+        this.currentFloor = currentFloor;
+    }
 
     private Direction getElevatorDirection() {
         return elevatorDirection;
@@ -103,13 +129,15 @@ public class Elevator {
         this.returnToFirstFloorAfter = returnToFirstFloorAfter;
     }
 
-    public void addDestination(int floorNumber) {
-        if (getFloors().contains(floorNumber)) {
+
+    public void addDestination(ElevatorRequest elevatorRequest) {
+        int requestFloorElevator = elevatorRequest.getFloorNumber();
+        if (this.getElevatorRequests().contains(elevatorRequest)) {
             return;
         }
 
         if (getCurrentState().equals(ElevatorState.IDLE)) {
-            setState(floorNumber >= getCurrentFloor() ? ElevatorState.GOING_UP : ElevatorState.GOING_DOWN);
+            setState(requestFloorElevator >= getCurrentFloor() ? ElevatorState.GOING_UP : ElevatorState.GOING_DOWN);
         }
     }
 

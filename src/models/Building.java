@@ -3,22 +3,30 @@ package models;
 import java.util.ArrayList;
 
 import gui.ElevatorDisplay;
+import reports.ActionReport;
 
 public class Building {
     private ArrayList<Floor> floors;
-    private ArrayList<Elevator> elevators;
-    public static boolean isUnitTest;
+    private int numElevators;
+    private static Building instance;
 
-    public Building(String configurationFilePath) {
+    public static Building getInstance()
+    {
+        if (instance == null) {
+            String configurationFilePath = "./configuration/json/20_floors_4_elevators.json";
+            return new Building(configurationFilePath);
+        }
+        return instance;
+    }
+
+
+    private Building(String configurationFilePath) {
         try {
             BuildingConfigurable jo = new ElevatorJsonConfiguration(configurationFilePath);
 
-            if (!isUnitTest) {
-                ElevatorDisplay.getInstance().initialize(jo.getNumberOfFloors());
-            }
+            ElevatorDisplay.getInstance().initialize(jo.getNumberOfFloors());
 
             setupFloors(jo);
-            setupElevators(jo);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -32,17 +40,7 @@ public class Building {
         }
     }
 
-    private void setupElevators(BuildingConfigurable buildingConfiguration) {
-        elevators = new ArrayList<>();
-        int numberOfElevators = buildingConfiguration.getNumberOfElevators();
-        int capacity = buildingConfiguration.getElevatorCapacity();
-        int elevatorSpeed = buildingConfiguration.getElevatorSpeedInMilliseconds();
-        int doorOpenTime = buildingConfiguration.getDoorOpenTime();
-        int returnToFirstFloor = buildingConfiguration.getReturnToFirstFloorAfter();
-        for (int elevatorID = 1; elevatorID <= numberOfElevators; elevatorID++) {
-            elevators.add(new Elevator(elevatorID, this, capacity, elevatorSpeed, doorOpenTime, returnToFirstFloor));
-        }
-    }
+    private void setNumElevators(int numElevators) { this.numElevators = numElevators; }
 
     public int getNumberOfFloors() {
         return floors.size();
@@ -52,11 +50,5 @@ public class Building {
         return floors.get(floorNumberZeroIndexed);
     }
 
-    public int getNumberOfElevators() {
-        return elevators.size();
-    }
-
-    public Elevator getElevator(int id) {
-        return elevators.get(id - 1);
-    }
+    public int getNumberOfElevators() { return numElevators; }
 }
