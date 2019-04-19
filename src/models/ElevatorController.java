@@ -43,4 +43,14 @@ public class ElevatorController {
             e.move(time);
         }
     }
+
+    public String toString() {
+        String output = "Elevator Controller report ...\n";
+
+        output += "Elevators: \n";
+        for (Elevator e : elevators) {
+            output += e.toString();
+        }
+        return output;
+    }
 }

@@ -37,4 +37,12 @@ public class Floor {
     private void removeWaitingPerson(int personIndex) {
         waitingPersons.remove(personIndex);
     }
+
+    public String toString() {
+        String output = "";
+        output += "Floor " + floorNumber + " Report ...\n";
+        output += "waitingPersons: " + waitingPersons.toString() + "\n";
+
+        return output;
+    }
 }

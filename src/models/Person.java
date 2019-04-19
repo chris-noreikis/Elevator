@@ -45,4 +45,8 @@ public class Person {
     private void setID(String ID) {
         this.id = ID;
     }
+
+    public String toString() {
+        return getId();
+    }
 }

@@ -52,4 +52,15 @@ public class Building {
     public void addPerson(Person p, int floorNum) {
         getFloor(floorNum - 1).addWaitingPerson(p);
     }
+
+    public String toString() {
+        String output = "";
+        output += "Building Report ...\n";
+
+        for (Floor f : floors) {
+            output += f.toString();
+        }
+
+        return output;
+    }
 }

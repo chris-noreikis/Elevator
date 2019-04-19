@@ -43,7 +43,7 @@ public class Elevator {
         System.out.println(String.format("Elevator %s created ...", id));
     }
 
-    public void addDestination(ElevatorRequest elevatorRequest) {
+    public void addFloorRequest(ElevatorRequest elevatorRequest) {
         int requestFloorElevator = elevatorRequest.getFloorNumber();
         if (this.getElevatorRequests().contains(elevatorRequest)) {
             return;
@@ -82,7 +82,7 @@ public class Elevator {
         return id;
     }
 
-    private boolean isDoorOpen() {
+    private boolean getIsDoorOpen() {
         return this.isDoorOpen;
     }
 
@@ -143,9 +143,14 @@ public class Elevator {
     }
 
 
-    public void debugState() {
-        System.out.println("Current elevator state...");
-        System.out.println(String.format("Current Floor: %s", getCurrentFloor()));
-        System.out.println(String.format("Current State: %s", getCurrentState()));
+    public String toString() {
+        String output = "";
+
+        output += "Elevator " + this.getID() + " report ...\n";
+        output += "Current Floor: " + getCurrentFloor() + "\n";
+        output += "Current Passengers: " + peopleOnElevator.toString() + "\n";
+        output += "Doors Open: " + getIsDoorOpen() + "\n";
+
+        return output;
     }
 }
