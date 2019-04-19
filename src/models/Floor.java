@@ -14,6 +14,7 @@ public class Floor {
     }
 
     public void addWaitingPerson(Person p) {
+        System.out.println("Adding person " + p.getId() + " to floor " + this.floorNumber);
         waitingPersons.add(p);
     }
 

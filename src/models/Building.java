@@ -48,4 +48,8 @@ public class Building {
     }
 
     public int getNumElevators() { return buildingConfiguration.getNumberOfElevators(); }
+
+    public void addPerson(Person p, int floorNum) {
+        getFloor(floorNum - 1).addWaitingPerson(p);
+    }
 }

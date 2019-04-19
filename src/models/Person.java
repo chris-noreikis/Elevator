@@ -5,9 +5,9 @@ import gui.ElevatorDisplay.Direction;
 public class Person {
     private int startFloor;
     private int endFloor;
-    private int id;
+    private String id;
 
-    public Person(int startFloor, int endFloor, int id) {
+    public Person(int startFloor, int endFloor, String id) {
         setStartFloor(startFloor);
         setEndFloor(endFloor);
         setID(id);
@@ -21,7 +21,7 @@ public class Person {
         return endFloor;
     }
 
-    public int getId() { return id; }
+    public String getId() { return id; }
 
     public boolean isDirectionUp() {
         return getStartFloor() < getEndFloor();
@@ -42,7 +42,7 @@ public class Person {
         this.endFloor = endFloor;
     }
 
-    private void setID(int ID) {
+    private void setID(String ID) {
         this.id = ID;
     }
 }

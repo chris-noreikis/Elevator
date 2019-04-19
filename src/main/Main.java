@@ -1,30 +1,12 @@
 
 package main;
 
-import gui.ElevatorDisplay;
-import models.Building;
-import models.Elevator;
-import models.ElevatorController;
-
 public class Main {
+    static int personCounter = 0;
 
     public static void main(String[] args) throws InterruptedException {
-        testScenarioOne();
-    }
-
-    private static void testScenarioOne() throws InterruptedException {
-        Building.getInstance();
-        for (int i = 0; i < 40; i++) {
-
-            if (i == 0) {
-                // add person to elevator
-            }
-
-            ElevatorController.getInstance().moveElevators(1000);
-            Thread.sleep(1000);
-        }
-
-        ElevatorDisplay.getInstance().shutdown();
+        ElevatorTestDriver d = new ElevatorTestDriver();
+        d.runTests();
     }
 
 //        public static void main(String[] args) throws InterruptedException {
