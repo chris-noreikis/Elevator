@@ -4,23 +4,27 @@ package main;
 import gui.ElevatorDisplay;
 import models.Building;
 import models.Elevator;
+import models.ElevatorController;
 
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-//        testScenarioZero();
         testScenarioOne();
     }
 
-    private static void testScenarioZero() {
-        Building b = new Building("./configuration/json/20_floors_4_elevators.json");
-    }
-
     private static void testScenarioOne() throws InterruptedException {
-        Building b = new Building("./configuration/json/20_floors_4_elevators.json");
-        Elevator e = b.getElevator(1);
-        e.addDestination(1);
-        e.debugState();
+        Building.getInstance();
+        for (int i = 0; i < 40; i++) {
+
+            if (i == 0) {
+                // add person to elevator
+            }
+
+            ElevatorController.getInstance().moveElevators(1000);
+            Thread.sleep(1000);
+        }
+
+        ElevatorDisplay.getInstance().shutdown();
     }
 
 //        public static void main(String[] args) throws InterruptedException {

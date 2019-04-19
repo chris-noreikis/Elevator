@@ -40,9 +40,22 @@ public class Elevator {
         floorRequests = new ArrayList<>();
         peopleOnElevator = new ArrayList<>();
 
-        ElevatorDisplay.getInstance().addElevator(id, 1);
-
         System.out.println(String.format("Elevator %s created ...", id));
+    }
+
+    public void addDestination(ElevatorRequest elevatorRequest) {
+        int requestFloorElevator = elevatorRequest.getFloorNumber();
+        if (this.getElevatorRequests().contains(elevatorRequest)) {
+            return;
+        }
+
+        if (getCurrentState().equals(ElevatorState.IDLE)) {
+            setState(requestFloorElevator >= getCurrentFloor() ? ElevatorState.GOING_UP : ElevatorState.GOING_DOWN);
+        }
+    }
+
+    public void move(int time) {
+        System.out.println("Moving elevator " + this.getID());
     }
 
     private void setState(ElevatorState e) {
@@ -129,17 +142,6 @@ public class Elevator {
         this.returnToFirstFloorAfter = returnToFirstFloorAfter;
     }
 
-
-    public void addDestination(ElevatorRequest elevatorRequest) {
-        int requestFloorElevator = elevatorRequest.getFloorNumber();
-        if (this.getElevatorRequests().contains(elevatorRequest)) {
-            return;
-        }
-
-        if (getCurrentState().equals(ElevatorState.IDLE)) {
-            setState(requestFloorElevator >= getCurrentFloor() ? ElevatorState.GOING_UP : ElevatorState.GOING_DOWN);
-        }
-    }
 
     public void debugState() {
         System.out.println("Current elevator state...");

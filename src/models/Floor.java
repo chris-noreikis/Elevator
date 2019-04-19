@@ -1,7 +1,5 @@
 package models;
 
-import reports.ActionReport;
-
 import java.util.ArrayList;
 
 public class Floor {
