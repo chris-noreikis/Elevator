@@ -27,4 +27,8 @@ public class ElevatorRequest {
     public void setFloor(int floor) {
         this.floor = floor;
     }
+
+    public String toString() {
+        return "Elevator Request: Floor: " + getFloorNumber() + " Direction: " + getDirection();
+    }
 }

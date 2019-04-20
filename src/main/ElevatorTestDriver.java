@@ -16,10 +16,14 @@ public class ElevatorTestDriver {
     }
 
     private void testOne() throws InterruptedException {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 50; i++) {
 
             if (i == 0) {
                 addPerson(1, 10, 1);
+            }
+
+            if(i == 6) {
+                addPerson(5, 6, 1);
             }
 
             ElevatorController.getInstance().moveElevators(1000);

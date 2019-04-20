@@ -1,5 +1,7 @@
 package models;
 
+import gui.ElevatorDisplay.Direction;
+
 import java.util.ArrayList;
 
 public class Floor {
@@ -7,10 +9,10 @@ public class Floor {
     private ArrayList<Person> donePersons;
     private int floorNumber;
 
-    public Floor(int floorNumber) {
+    public Floor(int floorNumberIn) {
         waitingPersons = new ArrayList<>();
         donePersons = new ArrayList<>();
-        this.floorNumber = floorNumber;
+        floorNumber = floorNumberIn;
     }
 
     public void addWaitingPerson(Person p) {
@@ -22,12 +24,10 @@ public class Floor {
         return waitingPersons.get(personIndex);
     }
 
-    public void sendPassengersToElevator(Elevator e) {
-        for (int i = 0; i < waitingPersons.size(); i++) {
-            Person personToAdd = waitingPersons.remove(i);
-            e.pickUpPassenger(personToAdd);
-            removeWaitingPerson(i);
-        }
+    public void movePersonFromFloorToElevator(int personIndex, Elevator e) {
+        Person personToAdd = waitingPersons.get(personIndex);
+        e.pickUpPassenger(personToAdd);
+        removeWaitingPerson(personIndex);
     }
 
     public int getNumberOfWaitingPersons() {
@@ -37,6 +37,8 @@ public class Floor {
     private void removeWaitingPerson(int personIndex) {
         waitingPersons.remove(personIndex);
     }
+
+    public int getFloorNumber() { return floorNumber; }
 
     public String toString() {
         String output = "";

@@ -46,6 +46,10 @@ public class Person {
         this.id = ID;
     }
 
+    public boolean isAtDestinationFloor(int floorNum) {
+        return floorNum == getEndFloor();
+    }
+
     public String toString() {
         return getId();
     }
