@@ -59,29 +59,31 @@ public class Elevator {
     public void move(int time) {
         System.out.println("Elevator " + this.getID() + " currently on Floor " + getCurrentFloor());
 
-        if (timeTilClose > 0) {
-            timeTilClose -= time;
-            System.out.println("TimeTillClose: " + timeTilClose);
-            if (timeTilClose == 0) {
-                closeDoors();
-                setToIdleIfNoMoreRequests();
-                if (!isRequestPoolEmpty()) {
-                    move();
-                }
-            }
-        } else if (timeLeftOnFloor > 0) {
-            timeLeftOnFloor -= Elevator.floorTime;
-            if (timeLeftOnFloor == 0) {
-                move();
-            }
-        } else if (isRequestPoolEmpty() && getElevatorDirection() == Direction.IDLE && getCurrentFloor() != 1) {
+        if (timeTilClose > 0 || timeLeftOnFloor > 0) {
+            timeTilClose = Math.max(timeTilClose - time, 0);
+            timeLeftOnFloor = Math.max(timeLeftOnFloor - time, 0);
+        }
+
+        if (timeTilClose > 0 || timeLeftOnFloor > 0) {
+            return;
+        }
+
+        if (isDoorOpen) {
+            closeDoors();
+            return;
+        }
+
+        if (isRequestPoolEmpty() && getElevatorDirection() == Direction.IDLE && getCurrentFloor() != 1) {
             idleCount += time;
             if (idleCount >= getReturnToFirstFloorAfter()) {
                 idleCount = 0;
                 addFloorRequest(new ElevatorRequest(Direction.DOWN, 1));
-                move();
             }
-        } else if (!isRequestPoolEmpty()) {
+        }
+
+        setToIdleIfNoMoreRequests();
+
+        if (!isRequestPoolEmpty()) {
             move();
         }
     }
@@ -116,7 +118,9 @@ public class Elevator {
             ArrayList<ElevatorRequest> sortedRequests = getSortedRequests();
             ElevatorRequest nextRequest = sortedRequests.get(0);
             timeLeftOnFloor = Elevator.floorTime;
-            setCurrentFloor(nextRequest.getFloorNumber() > getCurrentFloor() ? currentFloor + 1 : currentFloor - 1);
+            int nextFloor = nextRequest.getFloorNumber() > getCurrentFloor() ? currentFloor + 1 : currentFloor - 1;
+            ElevatorLogger.getInstance().logAction("Elevator " + getID() + " moving from floor " + currentFloor + " to floor " + nextFloor);
+            setCurrentFloor(nextFloor);
         }
     }
 
@@ -308,7 +312,9 @@ public class Elevator {
         return this.peopleOnElevator;
     }
 
-    public ArrayList<ElevatorRequest> getRiderRequests() { return this.riderRequests; }
+    public ArrayList<ElevatorRequest> getRiderRequests() {
+        return this.riderRequests;
+    }
 
     public void resetState() {
         setIsDoorOpen(false);

@@ -29,7 +29,7 @@ class ElevatorTest {
 
     @Test
     @DisplayName("Test case 1 - Doors open")
-    void opensDoorsForPassengerOnFirstFloor() {
+    void opensDoorsForPassengerOnFirstFloor() throws InterruptedException {
         addPerson(1, 10, 1);
         assertEquals(elevator.getFloorRequests().get(0), new ElevatorRequest(Direction.UP, 1));
         moveElevatorNumTimes(1);
@@ -38,15 +38,14 @@ class ElevatorTest {
         assertEquals(true, elevator.getIsDoorOpen());
         moveElevatorNumTimes(1);
         assertEquals(false, elevator.getIsDoorOpen());
-        assertEquals(2, elevator.getCurrentFloor());
-        moveElevatorNumTimes(1);
-        ElevatorController.getInstance().moveElevators(2000);
-        assertEquals(false, elevator.getIsDoorOpen());
+        assertEquals(1, elevator.getCurrentFloor());
+        moveElevatorNumTimes(10);
+        assertEquals(true, elevator.getIsDoorOpen());
     }
 
     @Test
     @DisplayName("Test case 1 - Rider can enter request")
-    void enterRiderRequestForPassenger() {
+    void enterRiderRequestForPassenger() throws InterruptedException {
         addPerson(1, 10, 1);
         ElevatorController.getInstance().moveElevators(1000);
         assertEquals(new ElevatorRequest(Direction.UP, 10), elevator.getRiderRequests().get(0));
@@ -54,7 +53,7 @@ class ElevatorTest {
 
     @Test
     @DisplayName("Test case 1 - Rider can be moved to 10th floor")
-    void takesPassengerToTenthFloor() {
+    void takesPassengerToTenthFloor() throws InterruptedException {
         addPerson(1, 10, 1);
 
         // Trigger person pickup
@@ -72,7 +71,7 @@ class ElevatorTest {
 
     @Test
     @DisplayName("Test case 1 - Elevator goes back to first floor after reset period")
-    void idleTest1() {
+    void idleTest1() throws InterruptedException {
         addPerson(1, 10, 1);
         // Doors open, passenger enters
         moveElevatorNumTimes(1);
@@ -95,18 +94,20 @@ class ElevatorTest {
         assertEquals(Direction.IDLE, elevator.getElevatorDirection());
     }
 
-    private void moveElevatorNumTimes(int numTimes) {
+    private void moveElevatorNumTimes(int numTimes) throws InterruptedException {
         for (int i = 0; i < numTimes; i++) {
             ElevatorController.getInstance().moveElevators(1000);
+            Thread.sleep(1000);
         }
     }
 
     private void addPerson(int start, int end, int elevId) {
         ElevatorDisplay.Direction d = end > start ? ElevatorDisplay.Direction.UP : ElevatorDisplay.Direction.DOWN;
-        Person p = new Person(start, end,"P" + personCounter++);
+        Person p = new Person(start, end, "P" + personCounter++);
+        ElevatorLogger.getInstance().logAction("Person " + p.getId() + " created " + " on Floor " + start + " wants to go " + d + " to floor " + end);
         people.add(p);
         Building.getInstance().addPerson(p, start);
         ElevatorController.getInstance().getElevator(elevId).addFloorRequest(new ElevatorRequest(d, start));
-        System.out.println("Person " + p.getId() + " pressed " + d + " on Floor " + start);
+        ElevatorLogger.getInstance().logAction("Person " + p.getId() + " pressed " + d + " on Floor " + start);
     }
 }
