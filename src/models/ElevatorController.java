@@ -25,7 +25,7 @@ public class ElevatorController {
         int numElevators = Building.getInstance().getNumElevators();
         elevators = new ArrayList<>();
         for (int elevatorID = 1; elevatorID <= numElevators; elevatorID++) {
-            elevators.add(new Elevator(elevatorID, 10, 1000, 2000, 5000));
+            elevators.add(new Elevator(elevatorID, 10, 1000, 2000, 10000));
             ElevatorDisplay.getInstance().addElevator(elevatorID, 1);
         }
     }

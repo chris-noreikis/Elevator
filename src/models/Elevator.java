@@ -96,16 +96,16 @@ public class Elevator {
     public void move(int time) {
 //        System.out.println("Elevator " + this.getID() + " currently on Floor " + getCurrentFloor());
 
-        if (timeTilClose > 0 || timeLeftOnFloor > 0) {
-            timeTilClose = Math.max(timeTilClose - time, 0);
+        if (getTimeTilClose() > 0 || timeLeftOnFloor > 0) {
+            setTimeTilClose(Math.max(getTimeTilClose() - time, 0));
             timeLeftOnFloor = Math.max(timeLeftOnFloor - time, 0);
         }
 
-        if (timeTilClose > 0 || timeLeftOnFloor > 0) {
+        if (getTimeTilClose() > 0 || timeLeftOnFloor > 0) {
             return;
         }
 
-        if (isDoorOpen) {
+        if (getIsDoorOpen()) {
             closeDoors();
             return;
         }
@@ -140,7 +140,7 @@ public class Elevator {
         boolean hasRiderRequest = floorHasRiderRequest();
         if (hasFloorRequest || hasRiderRequest) {
             openDoors();
-            timeTilClose = Elevator.doorTime;
+            setTimeTilClose(Elevator.doorTime);
             if (hasFloorRequest) {
                 handleFloorRequest();
             }
@@ -252,6 +252,7 @@ public class Elevator {
         for (Person p : peopleOnElevator) {
             if (p.isAtDestinationFloor(currentFloor)) {
                 ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getID() + " " + getRidersText());
+                Building.getInstance().getFloor(currentFloor - 1).addDonePerson(p);
                 continue;
             }
 
@@ -366,7 +367,7 @@ public class Elevator {
         riderRequests = new ArrayList<>();
         peopleOnElevator = new ArrayList<>();
         timeLeftOnFloor = 0;
-        timeTilClose = 0;
+        setTimeTilClose(0);
         idleCount = 0;
     }
 
@@ -383,5 +384,13 @@ public class Elevator {
         output += "Doors Open: " + getIsDoorOpen() + "\n";
 
         return output;
+    }
+
+    private int getTimeTilClose() {
+        return timeTilClose;
+    }
+
+    private void setTimeTilClose(int timeTilClose) {
+        this.timeTilClose = timeTilClose;
     }
 }

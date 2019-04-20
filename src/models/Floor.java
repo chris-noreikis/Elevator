@@ -24,10 +24,18 @@ public class Floor {
         return waitingPersons.get(personIndex);
     }
 
+    public Person getDonePerson(int personIndex) {
+        return donePersons.get(personIndex);
+    }
+
     public void movePersonFromFloorToElevator(int personIndex, Elevator e) {
         Person personToAdd = waitingPersons.get(personIndex);
         e.pickUpPassenger(personToAdd);
         removeWaitingPerson(personIndex);
+    }
+
+    public void addDonePerson(Person p) {
+        donePersons.add(p);
     }
 
     public int getNumberOfWaitingPersons() {

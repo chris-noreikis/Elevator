@@ -67,6 +67,8 @@ class ElevatorTest {
             ElevatorController.getInstance().moveElevators(1000);
         }
         assertEquals(true, elevator.getIsDoorOpen());
+        assertEquals(0, elevator.getPeopleOnElevator().size());
+        assertEquals(people.get(people.size() - 1), Building.getInstance().getFloor(9).getDonePerson(0));
     }
 
     @Test
@@ -87,9 +89,9 @@ class ElevatorTest {
 
         // Wait for idle time
         moveElevatorNumTimes(5);
-        assertEquals(9, elevator.getCurrentFloor());
-        assertEquals(Direction.DOWN, elevator.getElevatorDirection());
-        moveElevatorNumTimes(12);
+        assertEquals(10, elevator.getCurrentFloor());
+        assertEquals(Direction.IDLE, elevator.getElevatorDirection());
+        moveElevatorNumTimes(18);
         assertEquals(1, elevator.getCurrentFloor());
         assertEquals(Direction.IDLE, elevator.getElevatorDirection());
     }
@@ -97,7 +99,7 @@ class ElevatorTest {
     private void moveElevatorNumTimes(int numTimes) throws InterruptedException {
         for (int i = 0; i < numTimes; i++) {
             ElevatorController.getInstance().moveElevators(1000);
-            Thread.sleep(1000);
+//            Thread.sleep(1000);
         }
     }
 
