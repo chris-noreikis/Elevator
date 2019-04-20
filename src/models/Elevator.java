@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static java.util.stream.Collectors.joining;
+
 public class Elevator {
     private int id;
     private boolean isDoorOpen;
@@ -54,10 +56,45 @@ public class Elevator {
         }
 
         floorRequests.add(elevatorRequest);
+
+        String action = "Elevator " + getID() + " is going to floor " + elevatorRequest.getFloorNumber() +
+                " for " + elevatorRequest.getDirection() + " request " + getRequestText();
+        ElevatorLogger.getInstance().logAction(action);
+    }
+
+    private String getRequestText() {
+        return getRiderRequestsText() + getCurrentFloorRequestsText();
+    }
+
+    private String getRiderRequestsText() {
+        String riders = riderRequests.stream()
+                .map(e -> Integer.toString(e.getFloorNumber()))
+                .collect(joining(","));
+
+        riders = riders.equals("") ? "none" : riders;
+        return "[Current Rider Requests: " + riders + "]";
+    }
+
+    private String getCurrentFloorRequestsText() {
+        String floors = floorRequests.stream()
+                .map(e -> Integer.toString(e.getFloorNumber()))
+                .collect(joining(","));
+
+        floors = floors.equals("") ? "none" : floors;
+        return "[Current Floor Requests: " + floors + "]";
+    }
+
+    private String getRidersText() {
+        String riders = peopleOnElevator.stream()
+                .map(e -> e.toString())
+                .collect(joining(","));
+
+        riders = riders.equals("") ? "none" : riders;
+        return "[Riders: " + riders + "]";
     }
 
     public void move(int time) {
-        System.out.println("Elevator " + this.getID() + " currently on Floor " + getCurrentFloor());
+//        System.out.println("Elevator " + this.getID() + " currently on Floor " + getCurrentFloor());
 
         if (timeTilClose > 0 || timeLeftOnFloor > 0) {
             timeTilClose = Math.max(timeTilClose - time, 0);
@@ -103,6 +140,7 @@ public class Elevator {
         boolean hasRiderRequest = floorHasRiderRequest();
         if (hasFloorRequest || hasRiderRequest) {
             openDoors();
+            timeTilClose = Elevator.doorTime;
             if (hasFloorRequest) {
                 handleFloorRequest();
             }
@@ -119,14 +157,20 @@ public class Elevator {
             ElevatorRequest nextRequest = sortedRequests.get(0);
             timeLeftOnFloor = Elevator.floorTime;
             int nextFloor = nextRequest.getFloorNumber() > getCurrentFloor() ? currentFloor + 1 : currentFloor - 1;
-            ElevatorLogger.getInstance().logAction("Elevator " + getID() + " moving from floor " + currentFloor + " to floor " + nextFloor);
+            ElevatorLogger.getInstance()
+                    .logAction("Elevator " + getID() + " moving from floor " + currentFloor + " to floor " + nextFloor + " " + getRequestText());
             setCurrentFloor(nextFloor);
         }
     }
 
     private void handleRiderRequest() {
-        timeTilClose = Elevator.doorTime;
         removeRiderRequests();
+    }
+
+    private void handleFloorRequest() {
+        movePeopleFromFloorToElevator();
+        ElevatorLogger.getInstance()
+                .logAction("Elevator " + getID() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
     }
 
     private boolean floorHasRiderRequest() {
@@ -166,20 +210,18 @@ public class Elevator {
         return sortedRequests;
     }
 
-    private void handleFloorRequest() {
-        timeTilClose = Elevator.doorTime;
-        movePeopleFromFloorToElevator();
-    }
-
     private void movePeopleFromFloorToElevator() {
         Floor f = Building.getInstance().getFloor(currentFloor - 1);
         removeFloorRequests(f);
         for (int i = 0; i < f.getNumberOfWaitingPersons(); i++) {
             f.movePersonFromFloorToElevator(i, this);
             Person justAddedPerson = peopleOnElevator.get(peopleOnElevator.size() - 1);
+            ElevatorLogger.getInstance().logAction("Person " + justAddedPerson.getId() + " entered Elevator " + getID() + " " + getRidersText());
             Direction d = getDirection(justAddedPerson.getEndFloor(), justAddedPerson.getStartFloor());
             ElevatorRequest newRequest = new ElevatorRequest(d, justAddedPerson.getEndFloor());
             riderRequests.add(newRequest);
+            ElevatorLogger.getInstance().logAction("Elevator " + getID() +
+                    " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
         }
     }
 
@@ -209,7 +251,7 @@ public class Elevator {
         ArrayList<Person> filteredPeople = new ArrayList<>();
         for (Person p : peopleOnElevator) {
             if (p.isAtDestinationFloor(currentFloor)) {
-                System.out.println("Person " + p.getId() + " is exiting elevator");
+                ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getID() + " " + getRidersText());
                 continue;
             }
 
@@ -219,12 +261,12 @@ public class Elevator {
     }
 
     private void openDoors() {
-        System.out.println("Opening doors for Elevator " + getID());
+        ElevatorLogger.getInstance().logAction("Elevator " + getID() + " Doors Open");
         setIsDoorOpen(true);
     }
 
     private void closeDoors() {
-        System.out.println("Closing doors for Elevator " + getID());
+        ElevatorLogger.getInstance().logAction("Elevator " + getID() + " Doors Close");
         setIsDoorOpen(false);
     }
 
