@@ -6,6 +6,7 @@ public class Person {
     private int startFloor;
     private int endFloor;
     private String id;
+    private double avgTimeWaiting;
 
     public Person(int startFloor, int endFloor, String id) {
         setStartFloor(startFloor);
@@ -19,6 +20,10 @@ public class Person {
 
     public int getEndFloor() {
         return endFloor;
+    }
+    
+    public double getAvgWaitTime() {
+    	return avgTimeWaiting;
     }
 
     public String getId() { return id; }
