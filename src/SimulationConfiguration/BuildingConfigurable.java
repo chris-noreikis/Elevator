@@ -1,4 +1,4 @@
-package models;
+package SimulationConfiguration;
 
 public interface BuildingConfigurable {
     public int getElevatorSpeedInMilliseconds();

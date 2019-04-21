@@ -1,5 +1,8 @@
 package models;
 
+import SimulationConfiguration.BuildingConfigurable;
+import SimulationConfiguration.ConfigurationException;
+import SimulationConfiguration.ElevatorConfigurationFactory;
 import gui.ElevatorDisplay;
 import org.junit.jupiter.api.*;
 import gui.ElevatorDisplay.Direction;
@@ -15,7 +18,15 @@ class ElevatorTest {
 
     @BeforeAll
     static void setupBuilding() {
-        Building.getInstance();
+        try {
+            String type = "json";
+            String filepath = "./configuration/json/20_floors_4_elevators.json";
+            BuildingConfigurable bc = ElevatorConfigurationFactory.build(type, filepath);
+            Building.initialize(bc);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         ElevatorController.getInstance();
     }
 
@@ -119,7 +130,7 @@ class ElevatorTest {
     }
 
     @Test
-    @DisplayName("Test case 3 - Rider enters request from 20th floor")
+    @DisplayName("Test case 4 - Rider enters request from 20th floor")
     void testFourMovePassengers() throws InterruptedException {
         addPerson(1, 10, 1);
         moveElevatorNumTimes(5);

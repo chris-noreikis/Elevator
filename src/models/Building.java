@@ -2,6 +2,9 @@ package models;
 
 import java.util.ArrayList;
 
+import SimulationConfiguration.BuildingConfigurable;
+import SimulationConfiguration.ConfigurationException;
+import SimulationConfiguration.ElevatorConfigurationFactory;
 import gui.ElevatorDisplay;
 
 public class Building {
@@ -9,19 +12,25 @@ public class Building {
     private static Building instance;
     private BuildingConfigurable buildingConfiguration;
 
-    public static Building getInstance()
-    {
+    public static void initialize(BuildingConfigurable bc) throws ConfigurationException {
         if (instance == null) {
-            String configurationFilePath = "./configuration/json/20_floors_4_elevators.json";
-            instance = new Building(configurationFilePath);
+            instance = new Building(bc);
+        } else {
+            throw new ConfigurationException("Cannot call initialize on a building that has already been created");
+        }
+    }
+
+    public static Building getInstance() {
+        if (instance == null) {
+            BuildingConfigurable bc = ElevatorConfigurationFactory.build();
+            instance = new Building(bc);
         }
         return instance;
     }
 
-
-    private Building(String configurationFilePath) {
+    private Building(BuildingConfigurable buildingConfigurationIn) {
         try {
-            buildingConfiguration = new ElevatorJsonConfiguration(configurationFilePath);
+            buildingConfiguration = buildingConfigurationIn;
 
             ElevatorDisplay.getInstance().initialize(buildingConfiguration.getNumberOfFloors());
 
@@ -47,7 +56,9 @@ public class Building {
         return floors.get(floorNumberZeroIndexed);
     }
 
-    public int getNumElevators() { return buildingConfiguration.getNumberOfElevators(); }
+    public int getNumElevators() {
+        return buildingConfiguration.getNumberOfElevators();
+    }
 
     public void addPerson(Person p, int floorNum) {
         getFloor(floorNum - 1).addWaitingPerson(p);

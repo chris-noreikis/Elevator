@@ -1,4 +1,4 @@
-package models;
+package SimulationConfiguration;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -7,7 +7,7 @@ import org.json.simple.parser.ParseException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class ElevatorJsonConfiguration implements BuildingConfigurable {
+public class JsonConfiguration implements BuildingConfigurable {
     private int elevatorSpeedInMilliseconds;
     private int elevatorCapacity;
     private int returnToFirstFloorAfter;
@@ -16,7 +16,7 @@ public class ElevatorJsonConfiguration implements BuildingConfigurable {
     private int numberOfFloors;
     private JSONObject configurationJSON;
 
-    public ElevatorJsonConfiguration(String configurationFilePath) throws ConfigurationException {
+    public JsonConfiguration(String configurationFilePath) throws ConfigurationException {
         try {
             parseAndSetConfigurationJSON(configurationFilePath);
             elevatorSpeedInMilliseconds = getConfigurationFieldFromJSON("elevatorSpeedInMilliseconds");
