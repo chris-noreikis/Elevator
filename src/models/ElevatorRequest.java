@@ -11,7 +11,7 @@ public class ElevatorRequest {
         this.setDirection(direction);
         this.setFloor(floor);
     }
-
+    
     public Direction getDirection() {
         return direction;
     }
