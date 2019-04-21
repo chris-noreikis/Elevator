@@ -272,14 +272,12 @@ public class Elevator {
         ArrayList<Person> filteredPeople = new ArrayList<>(peopleOnElevator);
         for (Person p : filteredPeople) {
             if (p.isAtDestinationFloor(currentFloor)) {
+                peopleOnElevator.remove(p);
                 ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getID() + " " + getRidersText());
                 Building.getInstance().getFloor(currentFloor - 1).addDonePerson(p);
                 continue;
             }
-
-            filteredPeople.add(p);
         }
-        peopleOnElevator = filteredPeople;
     }
 
     private void openDoors() {
