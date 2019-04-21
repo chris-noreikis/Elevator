@@ -16,3 +16,5 @@
 - [ ] Figure out what to do when elevator is at capacity.  Ignore request?  Re-queue floor request?
 - [ ] Integrate elevator with UI
 - [ ] Add avg time waiting to person class
+- [ ] Add Person ride time duration
+
