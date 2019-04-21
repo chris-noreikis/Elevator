@@ -40,7 +40,7 @@ public class ElevatorController {
 
     public void moveElevators(int time) {
         for (Elevator e : elevators) {
-            e.move(time);
+            e.doTimeSlice(time);
         }
     }
 

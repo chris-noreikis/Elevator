@@ -96,10 +96,41 @@ class ElevatorTest {
         assertEquals(Direction.IDLE, elevator.getElevatorDirection());
     }
 
+    @Test
+    @DisplayName("Test case 2 - Rider enters request from 20th floor")
+    void testTwoMoveTwoPassenger() throws InterruptedException {
+        addPerson(20, 5, 2);
+        moveElevatorNumTimes(10);
+        addPerson(15, 19, 2);
+        moveElevatorNumTimes(40);
+        assertEquals(people.get(people.size() - 1), Building.getInstance().getFloor(18).getDonePerson(0));
+        assertEquals(people.get(people.size() - 2), Building.getInstance().getFloor(4).getDonePerson(0));
+    }
+
+    @Test
+    @DisplayName("Test case 3 - Rider enters request from 20th floor")
+    void testThreeMoveTwoPassengers() throws InterruptedException {
+        addPerson(20, 1, 3);
+        moveElevatorNumTimes(25);
+        addPerson(10, 1, 3);
+        moveElevatorNumTimes(40);
+        assertEquals(people.get(people.size() - 1), Building.getInstance().getFloor(0).getDonePerson(1));
+        assertEquals(people.get(people.size() - 2), Building.getInstance().getFloor(0).getDonePerson(0));
+    }
+
+    @Test
+    @DisplayName("Test case 3 - Rider enters request from 20th floor")
+    void testFourMovePassengers() throws InterruptedException {
+        addPerson(1, 10, 1);
+        moveElevatorNumTimes(5);
+        addPerson(8, 17, 1);
+        moveElevatorNumTimes(5);
+    }
+
     private void moveElevatorNumTimes(int numTimes) throws InterruptedException {
         for (int i = 0; i < numTimes; i++) {
             ElevatorController.getInstance().moveElevators(1000);
-//            Thread.sleep(1000);
+            Thread.sleep(1000);
         }
     }
 
