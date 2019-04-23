@@ -112,7 +112,7 @@ public class Elevator {
             idleCount += time;
             if (idleCount >= getReturnToFirstFloorAfter()) {
                 idleCount = 0;
-                addFloorRequest(new ElevatorRequest(Direction.DOWN, 1));
+                addFloorRequest(new ElevatorRequest(Direction.UP, 1));
             }
         }
 
@@ -144,8 +144,6 @@ public class Elevator {
     }
 
     private void move() {
-        setDirectionIfTopOrBottomFloor();
-
         boolean hasFloorRequest = floorHasFloorRequest();
         boolean hasRiderRequest = floorHasRiderRequest();
 
@@ -171,6 +169,9 @@ public class Elevator {
             ElevatorLogger.getInstance()
                     .logAction("Elevator " + getID() + " moving from floor " + currentFloor + " to floor " + nextFloor + " " + getRequestText());
             setCurrentFloor(nextFloor);
+            if (nextFloor == nextRequest.getFloorNumber()) {
+                setElevatorDirection(nextRequest.getDirection());
+            }
         }
     }
 

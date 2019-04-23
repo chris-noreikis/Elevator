@@ -47,6 +47,11 @@ public class Floor {
 
     public int getFloorNumber() { return floorNumber; }
 
+    public void resetState() {
+        waitingPersons = new ArrayList<>();
+        donePersons = new ArrayList<>();
+    }
+
     public String toString() {
         String output = "";
         output += "Floor " + floorNumber + " Report ...\n";

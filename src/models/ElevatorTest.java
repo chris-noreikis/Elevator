@@ -35,6 +35,9 @@ class ElevatorTest {
         people = new ArrayList<>();
         elevator = ElevatorController.getInstance().getElevator(1);
         elevator.resetState();
+        for (int i = 0; i < Building.getInstance().getNumberOfFloors(); i++) {
+            Building.getInstance().getFloor(i).resetState();
+        }
     }
 
 
@@ -138,10 +141,18 @@ class ElevatorTest {
         moveElevatorNumTimes(5);
     }
 
+    @Test
+    @DisplayName("Rider enters down request from 5th floor")
+    void canGoDown() throws InterruptedException {
+        addPerson(5, 1, 1);
+        moveElevatorNumTimes(15);
+        assertEquals(people.get(0), Building.getInstance().getFloor(0).getDonePerson(0));
+    }
+
     private void moveElevatorNumTimes(int numTimes) throws InterruptedException {
         for (int i = 0; i < numTimes; i++) {
             ElevatorController.getInstance().moveElevators(1000);
-            Thread.sleep(1000);
+//            Thread.sleep(1000);
         }
     }
 
