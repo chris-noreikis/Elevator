@@ -13,6 +13,11 @@ public class ElevatorTestDriver {
         Building.getInstance();
         ElevatorController.getInstance();
         testOne();
+        testTwo();
+        testThree();
+        testFour();
+        report();
+        ElevatorDisplay.getInstance().shutdown();
     }
 
     private void testOne() throws InterruptedException {
@@ -22,15 +27,58 @@ public class ElevatorTestDriver {
                 addPerson(1, 10, 1);
             }
 
-            if(i == 6) {
-                addPerson(5, 6, 1);
+            ElevatorController.getInstance().moveElevators(1000);
+            Thread.sleep(1000);
+        }
+    }
+
+    private void testTwo() throws InterruptedException {
+        for (int i = 0; i < 70; i++) {
+
+            if (i == 0) {
+                addPerson(20, 5, 2);
+            }
+
+            if (i == 5) {
+                addPerson(15, 19, 2);
             }
 
             ElevatorController.getInstance().moveElevators(1000);
             Thread.sleep(1000);
         }
-        report();
-        ElevatorDisplay.getInstance().shutdown();
+    }
+
+    private void testThree() throws InterruptedException {
+        for (int i = 0; i < 70; i++) {
+
+            if (i == 0) {
+                addPerson(20, 1, 3);
+            }
+
+            if (i == 24) {
+                addPerson(10, 1, 3);
+            }
+
+            ElevatorController.getInstance().moveElevators(1000);
+            Thread.sleep(1000);
+        }
+    }
+
+
+    private void testFour() throws InterruptedException {
+        for (int i = 0; i < 40; i++) {
+
+            if (i == 0) {
+                addPerson(1, 6, 1);
+            }
+
+            if (i == 22) {
+                addPerson(3, 1, 1);
+            }
+
+            ElevatorController.getInstance().moveElevators(1000);
+            Thread.sleep(1000);
+        }
     }
 
     private void addPerson(int start, int end, int elevId) {

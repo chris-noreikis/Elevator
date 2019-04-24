@@ -56,6 +56,8 @@ public class Floor {
         String output = "";
         output += "Floor " + floorNumber + " Report ...\n";
         output += "waitingPersons: " + waitingPersons.toString() + "\n";
+        output += "donePersons: " + donePersons.toString() + "\n";
+        output += "---------------\n";
 
         return output;
     }

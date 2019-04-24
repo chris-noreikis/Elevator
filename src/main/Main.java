@@ -16,7 +16,7 @@ public class Main {
             BuildingConfigurable bc = ElevatorConfigurationFactory.build(type, filepath);
             Building.initialize(bc);
         } catch (IndexOutOfBoundsException ex) {
-            System.out.println("Program requires two arguments: type [json], filepath [any valid filepath]");
+            System.out.println("Program requires two arguments: a file type [json], filepath [any valid filepath]");
             System.exit(1);
         } catch (ConfigurationException ex) {
             ex.printStackTrace();

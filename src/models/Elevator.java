@@ -176,7 +176,7 @@ public class Elevator {
     }
 
     private void handleRiderRequest() {
-        removeRiderRequests();
+        movePeopleFromElevatorToFloor();
     }
 
     private void handleFloorRequest() {
@@ -241,7 +241,9 @@ public class Elevator {
             ElevatorLogger.getInstance().logAction("Person " + justAddedPerson.getId() + " entered Elevator " + getID() + " " + getRidersText());
             Direction d = getDirection(justAddedPerson.getEndFloor(), justAddedPerson.getStartFloor());
             ElevatorRequest newRequest = new ElevatorRequest(d, justAddedPerson.getEndFloor());
-            riderRequests.add(newRequest);
+            if (!riderRequests.contains(newRequest)) {
+                riderRequests.add(newRequest);
+            }
             ElevatorLogger.getInstance().logAction("Elevator " + getID() +
                     " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
         }
@@ -259,7 +261,7 @@ public class Elevator {
         floorRequests = filteredFloorRequests;
     }
 
-    private void removeRiderRequests() {
+    private void movePeopleFromElevatorToFloor() {
         ArrayList<ElevatorRequest> filteredRiderRequests = new ArrayList<>();
         for (ElevatorRequest request : riderRequests) {
             if (request.getFloorNumber() == currentFloor) {
@@ -402,6 +404,7 @@ public class Elevator {
         output += "Current Rider Requests " + riderRequests + "\n";
         output += "Current Passengers: " + peopleOnElevator.toString() + "\n";
         output += "Doors Open: " + getIsDoorOpen() + "\n";
+        output += "---------------\n";
 
         return output;
     }
