@@ -10,28 +10,29 @@ import gui.ElevatorDisplay;
 public class Building {
     private ArrayList<Floor> floors;
     private static Building instance;
-    private BuildingConfigurable buildingConfiguration;
+    private static BuildingConfigurable buildingConfiguration = Building.initialize();
 
-    public static void initialize(BuildingConfigurable bc) throws ConfigurationException {
-        if (instance == null) {
-            instance = new Building(bc);
-        } else {
-            throw new ConfigurationException("Cannot call initialize on a building that has already been created");
+
+    private static BuildingConfigurable initialize() {
+        try {
+            return ElevatorConfigurationFactory.build("json", "configuration/json/20_floors_4_elevators.json");
+        } catch (ConfigurationException ex) {
+            ex.printStackTrace();
+            System.exit(1);
         }
+
+        return null;
     }
 
     public static Building getInstance() {
         if (instance == null) {
-            BuildingConfigurable bc = ElevatorConfigurationFactory.build();
-            instance = new Building(bc);
+            instance = new Building();
         }
         return instance;
     }
 
-    private Building(BuildingConfigurable buildingConfigurationIn) {
+    private Building() {
         try {
-            buildingConfiguration = buildingConfigurationIn;
-
             ElevatorDisplay.getInstance().initialize(buildingConfiguration.getNumberOfFloors());
 
             setupFloors();

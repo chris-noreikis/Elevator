@@ -144,6 +144,8 @@ public class Elevator {
     }
 
     private void move() {
+        setDirectionIfTopOrBottomFloor();
+
         boolean hasFloorRequest = floorHasFloorRequest();
         boolean hasRiderRequest = floorHasRiderRequest();
 
@@ -255,6 +257,15 @@ public class Elevator {
             if (request.getDirection() == getElevatorDirection() && request.getFloorNumber() == f.getFloorNumber()) {
                 continue;
             }
+
+//            if (getCurrentFloor() == Building.getInstance().getNumberOfFloors() && request.getFloorNumber() == getCurrentFloor()) {
+//                continue;
+//            }
+//
+//            int defaultFloor = 1;
+//            if (getCurrentFloor() == defaultFloor && request.getFloorNumber() == getCurrentFloor()) {
+//                continue;
+//            }
 
             filteredFloorRequests.add(request);
         }

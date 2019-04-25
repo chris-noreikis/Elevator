@@ -18,15 +18,7 @@ class ElevatorTest {
 
     @BeforeAll
     static void setupBuilding() {
-        try {
-            String type = "json";
-            String filepath = "./configuration/json/20_floors_4_elevators.json";
-            BuildingConfigurable bc = ElevatorConfigurationFactory.build(type, filepath);
-            Building.initialize(bc);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
+        Building.getInstance();
         ElevatorController.getInstance();
     }
 
