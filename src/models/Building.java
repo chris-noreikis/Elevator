@@ -42,7 +42,7 @@ public class Building {
         }
     }
 
-    private void setupFloors() {
+    private void setupFloors(){
         int numberOfFloors = buildingConfiguration.getNumberOfFloors();
         floors = new ArrayList<>();
         for (int i = 0; i < numberOfFloors; i++) {

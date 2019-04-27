@@ -1,6 +1,7 @@
 package models;
 
 import gui.ElevatorDisplay.Direction;
+import exceptions.*;
 
 public class Person {
     private int startFloor;

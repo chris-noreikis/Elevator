@@ -1,0 +1,14 @@
+{
+    "telemetry.machineId": "d1b0d987f7f61d2229dbe795f92c767e80a54548ee637ffe36df84094c59fdef",
+    "openedPathsList": {
+        "workspaces3": [
+            {
+                "id": "f86a9873e5b71c48dac099ed3bcc6e44",
+                "configURIPath": "file:///c%3A/wamp64/www/elevator/src/.metadata/codemix.code-workspace"
+            }
+        ],
+        "files2": []
+    },
+    "theme": "vs-dark",
+    "themeBackground": "#221a0f"
+}

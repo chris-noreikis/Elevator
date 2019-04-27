@@ -4,6 +4,8 @@ import gui.ElevatorDisplay;
 
 import java.util.ArrayList;
 
+import exceptions. *;
+
 public class ElevatorLogger {
     private static ElevatorLogger instance;
     private long creationTimestamp;
