@@ -12,13 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ElevatorTestDriver {
     private int personCounter = 1;
-    private boolean SIMULATION_MODE = true;
-    private boolean TEST_MODE = false;
+    private boolean SIMULATION_MODE = false;
+    private boolean TEST_MODE = true;
     private ArrayList<Person> people;
 
     void runTests() throws InterruptedException {
-        Building.getInstance();
-        ElevatorController.getInstance();
         testOne();
         testTwo();
         testThree();
@@ -29,10 +27,9 @@ public class ElevatorTestDriver {
 
     @BeforeEach
     void resetState() {
+        Building.getInstance().resetState();
+        ElevatorController.getInstance().resetState();
         people = new ArrayList<>();
-        for (int i = 0; i < Building.getInstance().getNumberOfFloors(); i++) {
-            Building.getInstance().getFloor(i).resetState();
-        }
     }
 
     @Test
@@ -116,7 +113,7 @@ public class ElevatorTestDriver {
                 addPerson(3, 1, 4);
             }
 
-            ElevatorController.getInstance().moveElevators(1000);
+            moveElevators(1000);
         }
 
         if (TEST_MODE) {

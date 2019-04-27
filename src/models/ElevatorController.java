@@ -44,6 +44,12 @@ public class ElevatorController {
         }
     }
 
+    public void resetState() {
+        for (Elevator e : elevators) {
+            e.resetState();
+        }
+    }
+
     public String toString() {
         String output = "Elevator Controller report ...\n";
 

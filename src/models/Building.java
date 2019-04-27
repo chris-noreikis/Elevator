@@ -65,6 +65,12 @@ public class Building {
         getFloor(floorNum - 1).addWaitingPerson(p);
     }
 
+    public void resetState() {
+        for (Floor f : floors) {
+            f.resetState();
+        }
+    }
+
     public String toString() {
         String output = "";
         output += "Building Report ...\n";

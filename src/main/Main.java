@@ -7,7 +7,7 @@ import models.ElevatorController;
 public class Main {
     static int personCounter = 0;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, Exception {
         Building.getInstance();
         ElevatorController.getInstance();
 
