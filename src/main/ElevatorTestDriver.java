@@ -1,5 +1,7 @@
 package main;
 
+import exceptions.InvalidStateException;
+import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
 import models.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +18,7 @@ public class ElevatorTestDriver {
     private boolean TEST_MODE = true;
     private ArrayList<Person> people;
 
-    void runTests() throws InterruptedException {
+    void runTests() throws InterruptedException, InvalidStateException {
         testOne();
         testTwo();
         testThree();
@@ -34,7 +36,7 @@ public class ElevatorTestDriver {
 
     @Test
     @DisplayName("Test case 1 - Single rider request")
-    void testOne() throws InterruptedException {
+    void testOne() throws InterruptedException, InvalidStateException {
         for (int time = 0; time < 50; time++) {
 
             if (time == 0) {
@@ -50,7 +52,7 @@ public class ElevatorTestDriver {
 
     @Test
     @DisplayName("Test case 2 - Pick up rider going in same direction, direction is UP")
-    void testTwo() throws InterruptedException {
+    void testTwo() throws InterruptedException, InvalidStateException {
         for (int time = 0; time < 70; time++) {
 
             if (time == 0) {
@@ -72,7 +74,7 @@ public class ElevatorTestDriver {
 
     @Test
     @DisplayName("Test case 3 - Pick up rider going in same direction, direction is DOWN")
-    void testThree() throws InterruptedException {
+    void testThree() throws InterruptedException, InvalidStateException {
         for (int time = 0; time < 70; time++) {
 
             if (time == 0) {
@@ -94,7 +96,7 @@ public class ElevatorTestDriver {
 
     @Test
     @DisplayName("Test case 4 - Elevator picks up request when responding to idle timeout, handles multiple up requests")
-    void testFour() throws InterruptedException {
+    void testFour() throws InterruptedException, InvalidStateException {
         for (int time = 0; time < 80; time++) {
 
             if (time == 0) {
@@ -126,7 +128,7 @@ public class ElevatorTestDriver {
 
     @Test
     @DisplayName("Test case 5 - Rider enters down request from 5th floor")
-    void testFive() throws InterruptedException {
+    void testFive() throws InterruptedException, InvalidStateException {
         for (int time = 0; time < 40; time++) {
             if (time == 0) {
                 addPerson(5, 1, 1);
@@ -139,20 +141,29 @@ public class ElevatorTestDriver {
         }
     }
 
-    private void moveElevators(int time) throws InterruptedException {
-        ElevatorController.getInstance().moveElevators(time);
+    private void moveElevators(int time) throws InterruptedException, InvalidStateException {
+        try {
+            ElevatorController.getInstance().moveElevators(time);
+        } catch (InvalidValueException ex) {
+            System.out.println("Bad input data");
+            ex.printStackTrace();
+        }
         if (SIMULATION_MODE) {
             Thread.sleep(time);
         }
     }
 
     private void addPerson(int start, int end, int elevId) {
-        ElevatorDisplay.Direction d = end > start ? ElevatorDisplay.Direction.UP : ElevatorDisplay.Direction.DOWN;
-        Person p = new Person(start, end, "P" + personCounter++);
-        people.add(p);
-        Building.getInstance().addPerson(p, start);
-        ElevatorController.getInstance().getElevator(elevId).addFloorRequest(new ElevatorRequest(d, start));
-        System.out.println("Person " + p.getId() + " pressed " + d + " on Floor " + start);
+        try {
+            ElevatorDisplay.Direction d = end > start ? ElevatorDisplay.Direction.UP : ElevatorDisplay.Direction.DOWN;
+            Person p = new Person(start, end, "P" + personCounter++);
+            people.add(p);
+            Building.getInstance().addPerson(p, start);
+            ElevatorController.getInstance().getElevator(elevId).addFloorRequest(new ElevatorRequest(d, start));
+            ElevatorLogger.getInstance().logAction("Person " + p.getId() + " pressed " + d + " on Floor " + start);
+        } catch (InvalidValueException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void report() {

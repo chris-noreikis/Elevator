@@ -1,5 +1,7 @@
 package models;
 
+import exceptions.InvalidStateException;
+import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
 import gui.ElevatorDisplay.Direction;
 
@@ -40,14 +42,18 @@ public class Elevator {
         peopleOnElevator = new ArrayList<>();
     }
 
-    public void addFloorRequest(ElevatorRequest elevatorRequest) {
+    public void addFloorRequest(ElevatorRequest elevatorRequest) throws InvalidValueException {
+        if (elevatorRequest.getFloorNumber() < 1 || elevatorRequest.getFloorNumber() > Building.getInstance().getNumberOfFloors()) {
+            throw new InvalidValueException("Invalid floor request: " + elevatorRequest.getFloorNumber());
+        }
+
         int requestFloorElevator = elevatorRequest.getFloorNumber();
         if (getFloorRequests().contains(elevatorRequest)) {
             return;
         }
 
         if (getElevatorDirection() == Direction.IDLE) {
-            setElevatorDirection(requestFloorElevator >= getCurrentFloor() ? Direction.UP : Direction.DOWN);
+            setElevatorDirection(getDirection(requestFloorElevator, getCurrentFloor()));
         }
 
         floorRequests.add(elevatorRequest);
@@ -57,10 +63,16 @@ public class Elevator {
         ElevatorLogger.getInstance().logAction(action);
     }
 
-    public void doTimeSlice(int time) {
+    public void doTimeSlice(int time) throws InvalidValueException, InvalidStateException {
+        if (time < 0) {
+            throw new InvalidValueException("Elevator told to move with invalid time: " + time);
+        }
+
         if (getTimeUntilDoorsClose() > 0 || getTimeLeftOnFloor() > 0) {
-            setTimeUntilDoorsClose(Math.max(getTimeUntilDoorsClose() - time, 0));
-            setTimeLeftOnFloor(Math.max(getTimeLeftOnFloor() - time, 0));
+            int nextDoorCloseTime = Math.max(getTimeUntilDoorsClose() - time, 0);
+            setTimeUntilDoorsClose(nextDoorCloseTime);
+            int nextTimeLeftOnFloorTime = Math.max(getTimeLeftOnFloor() - time, 0);
+            setTimeLeftOnFloor(nextTimeLeftOnFloorTime);
         }
 
         if (getTimeUntilDoorsClose() > 0 || getTimeLeftOnFloor() > 0) {
@@ -87,7 +99,7 @@ public class Elevator {
         }
     }
 
-    private void move() {
+    private void move() throws InvalidStateException {
         setDirectionIfTopOrBottomFloor();
 
         boolean hasFloorRequest = floorHasFloorRequest();
@@ -97,15 +109,18 @@ public class Elevator {
             openDoors();
             setTimeUntilDoorsClose(getDoorOpenTimeInMilliseconds());
             if (hasRiderRequest) {
-                handleRiderRequest();
+                movePeopleFromElevatorToFloor();
             }
 
             if (hasFloorRequest) {
-                handleFloorRequest();
+                movePeopleFromFloorToElevator();
             }
 
         } else {
-            ArrayList<ElevatorRequest> sortedRequests = getSortedRequests();
+            if (getIsDoorOpen()) {
+                throw new InvalidStateException("Elevator in motion with open doors");
+            }
+
             setTimeLeftOnFloor(getElevatorSpeedInMilliseconds());
             int nextFloor = getElevatorDirection() == Direction.UP ? currentFloor + 1 : currentFloor - 1;
             ElevatorLogger.getInstance()
@@ -153,16 +168,6 @@ public class Elevator {
         return riderRequests.isEmpty() && floorRequests.isEmpty();
     }
 
-    private void handleRiderRequest() {
-        movePeopleFromElevatorToFloor();
-    }
-
-    private void handleFloorRequest() {
-        movePeopleFromFloorToElevator();
-        ElevatorLogger.getInstance()
-                .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
-    }
-
     private boolean floorHasRiderRequest() {
         for (ElevatorRequest e : riderRequests) {
             if (e.getFloorNumber() == getCurrentFloor()) {
@@ -187,12 +192,7 @@ public class Elevator {
         sortedRequests.addAll(floorRequests);
         sortedRequests.addAll(riderRequests);
 
-        sortedRequests.sort(new Comparator<ElevatorRequest>() {
-            @Override
-            public int compare(ElevatorRequest o1, ElevatorRequest o2) {
-                return o2.getFloorNumber() - o1.getFloorNumber();
-            }
-        });
+        sortedRequests.sort((o1, o2) -> o2.getFloorNumber() - o1.getFloorNumber());
 
         if (getElevatorDirection() == Direction.UP) {
             Collections.reverse(sortedRequests);
@@ -201,7 +201,22 @@ public class Elevator {
         return sortedRequests;
     }
 
+    private void removeFloorRequests(Floor f) {
+        ArrayList<ElevatorRequest> filteredFloorRequests = new ArrayList<>();
+        for (ElevatorRequest request : floorRequests) {
+            if (request.getDirection() == getElevatorDirection() && request.getFloorNumber() == f.getFloorNumber()) {
+                continue;
+            }
+
+            filteredFloorRequests.add(request);
+        }
+        floorRequests = filteredFloorRequests;
+    }
+
     private void movePeopleFromFloorToElevator() {
+        ElevatorLogger.getInstance()
+                .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
+
         Floor f = Building.getInstance().getFloor(currentFloor - 1);
         removeFloorRequests(f);
         for (int i = 0; i < f.getNumberOfWaitingPersons(); i++) {
@@ -216,18 +231,6 @@ public class Elevator {
             ElevatorLogger.getInstance().logAction("Elevator " + getId() +
                     " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
         }
-    }
-
-    private void removeFloorRequests(Floor f) {
-        ArrayList<ElevatorRequest> filteredFloorRequests = new ArrayList<>();
-        for (ElevatorRequest request : floorRequests) {
-            if (request.getDirection() == getElevatorDirection() && request.getFloorNumber() == f.getFloorNumber()) {
-                continue;
-            }
-
-            filteredFloorRequests.add(request);
-        }
-        floorRequests = filteredFloorRequests;
     }
 
     private void movePeopleFromElevatorToFloor() {
@@ -252,13 +255,21 @@ public class Elevator {
         }
     }
 
-    private void openDoors() {
+    private void openDoors() throws InvalidStateException {
+        if (getIsDoorOpen()) {
+            throw new InvalidStateException("Opening already open doors");
+        }
+
         ElevatorLogger.getInstance().logAction("Elevator " + getId() + " Doors Open");
         setIsDoorOpen(true);
         ElevatorDisplay.getInstance().openDoors(getId());
     }
 
-    private void closeDoors() {
+    private void closeDoors() throws InvalidStateException {
+        if (!getIsDoorOpen()) {
+            throw new InvalidStateException("Closing already closed doors");
+        }
+
         ElevatorLogger.getInstance().logAction("Elevator " + getId() + " Doors Close");
         setIsDoorOpen(false);
         ElevatorDisplay.getInstance().closeDoors(getId());

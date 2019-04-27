@@ -1,5 +1,7 @@
 package models;
 
+import exceptions.InvalidStateException;
+import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
 
 import java.util.ArrayList;
@@ -30,15 +32,11 @@ public class ElevatorController {
         }
     }
 
-    public int getNumberOfElevators() {
-        return elevators.size();
-    }
-
     public Elevator getElevator(int id) {
         return elevators.get(id - 1);
     }
 
-    public void moveElevators(int time) {
+    public void moveElevators(int time) throws InvalidValueException, InvalidStateException {
         for (Elevator e : elevators) {
             e.doTimeSlice(time);
         }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import SimulationConfiguration.BuildingConfigurable;
 import SimulationConfiguration.ConfigurationException;
 import SimulationConfiguration.ElevatorConfigurationFactory;
+import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
 
 public class Building {
@@ -61,7 +62,13 @@ public class Building {
         return buildingConfiguration.getNumberOfElevators();
     }
 
-    public void addPerson(Person p, int floorNum) {
+    public void addPerson(Person p, int floorNum) throws InvalidValueException {
+        if (p.getStartFloor() < 1 || p.getEndFloor() > getNumberOfFloors()) {
+            throw new InvalidValueException("Person is trying to go to a floor that doesn\'t exist: " + p.getEndFloor());
+        }
+        if (p.getEndFloor() > Building.getInstance().getNumberOfFloors() || p.getEndFloor() < 1) {
+            throw new InvalidValueException("Person is trying to go to a floor that doesn\'t exist: " + p.getEndFloor());
+        }
         getFloor(floorNum - 1).addWaitingPerson(p);
     }
 

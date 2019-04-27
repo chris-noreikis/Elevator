@@ -1,18 +1,27 @@
 
 package main;
 
+import exceptions.InvalidStateException;
+import exceptions.InvalidValueException;
 import models.Building;
 import models.ElevatorController;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 public class Main {
     static int personCounter = 0;
 
-    public static void main(String[] args) throws InterruptedException, Exception {
+    public static void main(String[] args) throws InterruptedException {
         Building.getInstance();
         ElevatorController.getInstance();
 
         ElevatorTestDriver d = new ElevatorTestDriver();
-        d.runTests();
+
+        try {
+            d.runTests();
+        } catch (InvalidStateException e) {
+            System.out.println("Elevator encountered a serious error");
+            e.printStackTrace();
+        }
     }
 
 //        public static void main(String[] args) throws InterruptedException {

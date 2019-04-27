@@ -1,5 +1,6 @@
 package models;
 
+import exceptions.InvalidValueException;
 import gui.ElevatorDisplay.Direction;
 
 import java.util.ArrayList;
@@ -17,10 +18,6 @@ public class Floor {
 
     public void addWaitingPerson(Person p) {
         waitingPersons.add(p);
-    }
-
-    public Person getWaitingPerson(int personIndex) {
-        return waitingPersons.get(personIndex);
     }
 
     public Person getDonePerson(int personIndex) {
