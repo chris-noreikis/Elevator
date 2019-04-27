@@ -7,11 +7,11 @@
 - [x] Person Class
 - [x] Make building a singleton
 - [x] Test 1
-- [ ] Test 2
-- [ ] Test 3
-- [ ] Test 4
-- [ ] Make elevator configuration a factory instead of hardcoding implementation 
-- [ ] Floor movement algorithm in elevator
+- [x] Test 2
+- [x] Test 3
+- [x] Test 4
+- [x] Make elevator configuration a factory instead of hardcoding implementation 
+- [x] Floor movement algorithm in elevator
 - [ ] Exception throwing / handling for public methods
 - [ ] Figure out what to do when elevator is at capacity.  Ignore request?  Re-queue floor request?
 - [ ] Integrate elevator with UI

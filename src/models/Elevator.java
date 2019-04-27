@@ -1,5 +1,6 @@
 package models;
 
+import gui.ElevatorDisplay;
 import gui.ElevatorDisplay.Direction;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class Elevator {
 
         floorRequests.add(elevatorRequest);
 
-        String action = "Elevator " + getID() + " is going to floor " + elevatorRequest.getFloorNumber() +
+        String action = "Elevator " + getId() + " is going to floor " + elevatorRequest.getFloorNumber() +
                 " for " + elevatorRequest.getDirection() + " request " + getRequestText();
         ElevatorLogger.getInstance().logAction(action);
     }
@@ -152,16 +153,22 @@ public class Elevator {
         if (hasFloorRequest || hasRiderRequest) {
             openDoors();
             setTimeTilClose(Elevator.doorTime);
-            if (hasFloorRequest) {
-                handleFloorRequest();
-            }
             if (hasRiderRequest) {
                 handleRiderRequest();
+            }
+            
+            if (hasFloorRequest) {
+                handleFloorRequest();
             }
 
             ArrayList<ElevatorRequest> sortedRequests = getSortedRequests();
             if (!sortedRequests.isEmpty()) {
-                setElevatorDirection(sortedRequests.get(0).getDirection());
+                if (getElevatorDirection() == Direction.UP && sortedRequests.get(0).getFloorNumber() < currentFloor) {
+                    setElevatorDirection(Direction.DOWN);
+                } else if (getElevatorDirection() == Direction.DOWN && sortedRequests.get(0).getFloorNumber() > currentFloor) {
+                    setElevatorDirection(Direction.UP);
+                }
+
             }
         } else {
             ArrayList<ElevatorRequest> sortedRequests = getSortedRequests();
@@ -169,12 +176,14 @@ public class Elevator {
             timeLeftOnFloor = Elevator.floorTime;
             int nextFloor = nextRequest.getFloorNumber() > getCurrentFloor() ? currentFloor + 1 : currentFloor - 1;
             ElevatorLogger.getInstance()
-                    .logAction("Elevator " + getID() + " moving from floor " + currentFloor + " to floor " + nextFloor + " " + getRequestText());
+                    .logAction("Elevator " + getId() + " moving from floor " + currentFloor + " to floor " + nextFloor + " " + getRequestText());
             setCurrentFloor(nextFloor);
             if (nextFloor == nextRequest.getFloorNumber()) {
                 setElevatorDirection(nextRequest.getDirection());
             }
         }
+
+        ElevatorDisplay.getInstance().updateElevator(getId(), getCurrentFloor(), getPeopleOnElevator().size(), getElevatorDirection());
     }
 
     private void handleRiderRequest() {
@@ -184,7 +193,7 @@ public class Elevator {
     private void handleFloorRequest() {
         movePeopleFromFloorToElevator();
         ElevatorLogger.getInstance()
-                .logAction("Elevator " + getID() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
+                .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
     }
 
     private boolean floorHasRiderRequest() {
@@ -240,13 +249,13 @@ public class Elevator {
         for (int i = 0; i < f.getNumberOfWaitingPersons(); i++) {
             f.movePersonFromFloorToElevator(i, this);
             Person justAddedPerson = peopleOnElevator.get(peopleOnElevator.size() - 1);
-            ElevatorLogger.getInstance().logAction("Person " + justAddedPerson.getId() + " entered Elevator " + getID() + " " + getRidersText());
+            ElevatorLogger.getInstance().logAction("Person " + justAddedPerson.getId() + " entered Elevator " + getId() + " " + getRidersText());
             Direction d = getDirection(justAddedPerson.getEndFloor(), justAddedPerson.getStartFloor());
             ElevatorRequest newRequest = new ElevatorRequest(d, justAddedPerson.getEndFloor());
             if (!riderRequests.contains(newRequest)) {
                 riderRequests.add(newRequest);
             }
-            ElevatorLogger.getInstance().logAction("Elevator " + getID() +
+            ElevatorLogger.getInstance().logAction("Elevator " + getId() +
                     " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
         }
     }
@@ -287,7 +296,7 @@ public class Elevator {
         for (Person p : filteredPeople) {
             if (p.isAtDestinationFloor(currentFloor)) {
                 peopleOnElevator.remove(p);
-                ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getID() + " " + getRidersText());
+                ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getId() + " " + getRidersText());
                 Building.getInstance().getFloor(currentFloor - 1).addDonePerson(p);
                 continue;
             }
@@ -295,13 +304,15 @@ public class Elevator {
     }
 
     private void openDoors() {
-        ElevatorLogger.getInstance().logAction("Elevator " + getID() + " Doors Open");
+        ElevatorLogger.getInstance().logAction("Elevator " + getId() + " Doors Open");
         setIsDoorOpen(true);
+        ElevatorDisplay.getInstance().openDoors(getId());
     }
 
     private void closeDoors() {
-        ElevatorLogger.getInstance().logAction("Elevator " + getID() + " Doors Close");
+        ElevatorLogger.getInstance().logAction("Elevator " + getId() + " Doors Close");
         setIsDoorOpen(false);
+        ElevatorDisplay.getInstance().closeDoors(getId());
     }
 
     private void setBuilding(Building b) {
@@ -316,7 +327,7 @@ public class Elevator {
         this.id = id;
     }
 
-    private int getID() {
+    private int getId() {
         return id;
     }
 
@@ -408,7 +419,7 @@ public class Elevator {
     public String toString() {
         String output = "";
 
-        output += "Elevator " + this.getID() + " report ...\n";
+        output += "Elevator " + getId() + " report ...\n";
         output += "Current Direction: " + getElevatorDirection() + "\n";
         output += "Current Floor: " + getCurrentFloor() + "\n";
         output += "Current Floor Requests " + floorRequests + "\n";

@@ -1,13 +1,20 @@
 package main;
 
 import gui.ElevatorDisplay;
-import models.Building;
-import models.ElevatorController;
-import models.ElevatorRequest;
-import models.Person;
+import models.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ElevatorTestDriver {
-    int personCounter = 1;
+    private int personCounter = 1;
+    private boolean SIMULATION_MODE = true;
+    private boolean TEST_MODE = false;
+    private ArrayList<Person> people;
 
     void runTests() throws InterruptedException {
         Building.getInstance();
@@ -20,70 +27,132 @@ public class ElevatorTestDriver {
         ElevatorDisplay.getInstance().shutdown();
     }
 
-    private void testOne() throws InterruptedException {
-        for (int i = 0; i < 50; i++) {
+    @BeforeEach
+    void resetState() {
+        people = new ArrayList<>();
+        for (int i = 0; i < Building.getInstance().getNumberOfFloors(); i++) {
+            Building.getInstance().getFloor(i).resetState();
+        }
+    }
 
-            if (i == 0) {
+    @Test
+    @DisplayName("Test case 1 - Single rider request")
+    void testOne() throws InterruptedException {
+        for (int time = 0; time < 50; time++) {
+
+            if (time == 0) {
                 addPerson(1, 10, 1);
             }
 
-            ElevatorController.getInstance().moveElevators(1000);
-            Thread.sleep(1000);
+            moveElevators(1000);
+        }
+        if (TEST_MODE) {
+            assertEquals(people.get(0), Building.getInstance().getFloor(9).getDonePerson(0));
         }
     }
 
-    private void testTwo() throws InterruptedException {
-        for (int i = 0; i < 70; i++) {
+    @Test
+    @DisplayName("Test case 2 - Pick up rider going in same direction, direction is UP")
+    void testTwo() throws InterruptedException {
+        for (int time = 0; time < 70; time++) {
 
-            if (i == 0) {
+            if (time == 0) {
                 addPerson(20, 5, 2);
             }
 
-            if (i == 5) {
+            if (time == 5) {
                 addPerson(15, 19, 2);
             }
 
-            ElevatorController.getInstance().moveElevators(1000);
-            Thread.sleep(1000);
+            moveElevators(1000);
+        }
+
+        if (TEST_MODE) {
+            assertEquals(people.get(0), Building.getInstance().getFloor(4).getDonePerson(0));
+            assertEquals(people.get(1), Building.getInstance().getFloor(18).getDonePerson(0));
         }
     }
 
-    private void testThree() throws InterruptedException {
-        for (int i = 0; i < 70; i++) {
+    @Test
+    @DisplayName("Test case 3 - Pick up rider going in same direction, direction is DOWN")
+    void testThree() throws InterruptedException {
+        for (int time = 0; time < 70; time++) {
 
-            if (i == 0) {
+            if (time == 0) {
                 addPerson(20, 1, 3);
             }
 
-            if (i == 24) {
+            if (time == 24) {
                 addPerson(10, 1, 3);
             }
 
-            ElevatorController.getInstance().moveElevators(1000);
-            Thread.sleep(1000);
+            moveElevators(1000);
+        }
+
+        if (TEST_MODE) {
+            assertEquals(people.get(0), Building.getInstance().getFloor(0).getDonePerson(0));
+            assertEquals(people.get(1), Building.getInstance().getFloor(0).getDonePerson(1));
         }
     }
 
+    @Test
+    @DisplayName("Test case 4 - Elevator picks up request when responding to idle timeout, handles multiple up requests")
+    void testFour() throws InterruptedException {
+        for (int time = 0; time < 80; time++) {
 
-    private void testFour() throws InterruptedException {
-        for (int i = 0; i < 40; i++) {
-
-            if (i == 0) {
-                addPerson(1, 6, 1);
+            if (time == 0) {
+                addPerson(1, 10, 1);
             }
 
-            if (i == 22) {
-                addPerson(3, 1, 1);
+            if (time == 5) {
+                addPerson(8, 17, 1);
+            }
+
+            if (time == 6) {
+                addPerson(1, 9, 4);
+            }
+
+            if (time == 32) {
+                addPerson(3, 1, 4);
             }
 
             ElevatorController.getInstance().moveElevators(1000);
-            Thread.sleep(1000);
+        }
+
+        if (TEST_MODE) {
+            assertEquals(people.get(0), Building.getInstance().getFloor(9).getDonePerson(0));
+            assertEquals(people.get(1), Building.getInstance().getFloor(16).getDonePerson(0));
+            assertEquals(people.get(2), Building.getInstance().getFloor(8).getDonePerson(0));
+            assertEquals(people.get(3), Building.getInstance().getFloor(0).getDonePerson(0));
+        }
+    }
+
+    @Test
+    @DisplayName("Test case 5 - Rider enters down request from 5th floor")
+    void testFive() throws InterruptedException {
+        for (int time = 0; time < 40; time++) {
+            if (time == 0) {
+                addPerson(5, 1, 1);
+            }
+            moveElevators(1000);
+        }
+
+        if (TEST_MODE) {
+            assertEquals(people.get(0), Building.getInstance().getFloor(0).getDonePerson(0));
+        }
+    }
+
+    private void moveElevators(int time) throws InterruptedException {
+        ElevatorController.getInstance().moveElevators(time);
+        if (SIMULATION_MODE) {
+            Thread.sleep(time);
         }
     }
 
     private void addPerson(int start, int end, int elevId) {
         ElevatorDisplay.Direction d = end > start ? ElevatorDisplay.Direction.UP : ElevatorDisplay.Direction.DOWN;
-        Person p = new Person(start, end,"P" + personCounter++);
+        Person p = new Person(start, end, "P" + personCounter++);
+        people.add(p);
         Building.getInstance().addPerson(p, start);
         ElevatorController.getInstance().getElevator(elevId).addFloorRequest(new ElevatorRequest(d, start));
         System.out.println("Person " + p.getId() + " pressed " + d + " on Floor " + start);
