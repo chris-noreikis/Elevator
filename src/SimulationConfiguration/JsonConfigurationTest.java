@@ -28,9 +28,9 @@ class JsonConfigurationTest {
     }
 
     @Test
-    void getReturnToFirstFloorAfter() throws ConfigurationException {
+    void getReturnToDefaultFloorTimeout() throws ConfigurationException {
             JsonConfiguration e = new JsonConfiguration(configurationFilePath);
-            assertEquals(e.getReturnToFirstFloorAfter(), 60000);
+            assertEquals(e.getReturnToDefaultFloorTimeout(), 60000);
     }
 
     @Test

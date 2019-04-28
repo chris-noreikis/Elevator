@@ -13,11 +13,11 @@ public class Building {
     private static Building instance;
     private static BuildingConfigurable buildingConfiguration = Building.initialize();
 
-
     private static BuildingConfigurable initialize() {
         try {
             return ElevatorConfigurationFactory.build("json", "configuration/json/20_floors_4_elevators.json");
         } catch (ConfigurationException ex) {
+            System.out.println("Building created with invalid configuration, exiting program");
             ex.printStackTrace();
             System.exit(1);
         }
@@ -33,16 +33,11 @@ public class Building {
     }
 
     private Building() {
-        try {
-            ElevatorDisplay.getInstance().initialize(buildingConfiguration.getNumberOfFloors());
-
-            setupFloors();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        ElevatorDisplay.getInstance().initialize(getNumberOfFloors());
+        setupFloors();
     }
 
-    private void setupFloors(){
+    private void setupFloors() {
         int numberOfFloors = buildingConfiguration.getNumberOfFloors();
         floors = new ArrayList<>();
         for (int i = 0; i < numberOfFloors; i++) {
@@ -50,31 +45,55 @@ public class Building {
         }
     }
 
+    public Floor getFloor(int floorNumber) {
+        return floors.get(floorNumber - 1);
+    }
+
     public int getNumberOfFloors() {
-        return floors.size();
+        return buildingConfiguration.getNumberOfFloors();
     }
 
-    public Floor getFloor(int floorNumberZeroIndexed) {
-        return floors.get(floorNumberZeroIndexed);
-    }
-
-    public int getNumElevators() {
+    public int getNumberOfElevators() {
         return buildingConfiguration.getNumberOfElevators();
     }
 
-    public void addPerson(Person p, int floorNum) throws InvalidValueException {
+    public int getElevatorCapacity() {
+        return buildingConfiguration.getElevatorCapacity();
+    }
+
+    public int getElevatorSpeed() {
+        return buildingConfiguration.getElevatorSpeedInMilliseconds();
+    }
+
+    public int getDoorOpenTime() {
+        return buildingConfiguration.getDoorOpenTime();
+    }
+
+    public int getReturnToDefaultFloorTimeout() {
+        return buildingConfiguration.getReturnToDefaultFloorTimeout();
+    }
+
+    public void addPerson(Person p, int floorNumber) throws InvalidValueException {
         if (p.getStartFloor() < 1 || p.getEndFloor() > getNumberOfFloors()) {
             throw new InvalidValueException("Person is trying to go to a floor that doesn\'t exist: " + p.getEndFloor());
         }
         if (p.getEndFloor() > Building.getInstance().getNumberOfFloors() || p.getEndFloor() < 1) {
             throw new InvalidValueException("Person is trying to go to a floor that doesn\'t exist: " + p.getEndFloor());
         }
-        getFloor(floorNum - 1).addWaitingPerson(p);
+        getFloor(floorNumber).addWaitingPerson(p);
     }
 
     public void resetState() {
         for (Floor f : floors) {
             f.resetState();
+        }
+    }
+
+    public void validateFloor(String errorMessage, int floorNumber) throws InvalidValueException {
+        if (floorNumber < 1 || floorNumber > getNumberOfFloors()) {
+            int maxFloor = getNumberOfFloors();
+            String errorMessageFormatted = String.format("%s; expected 1-%d, got %d", errorMessage, maxFloor, floorNumber);
+            throw new InvalidValueException(errorMessageFormatted);
         }
     }
 

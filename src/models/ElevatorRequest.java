@@ -5,7 +5,6 @@ import gui.ElevatorDisplay.Direction;
 public class ElevatorRequest {
     private Direction direction;
     private int floor;
-    private boolean isRiderRequest;
 
     public ElevatorRequest(Direction direction, int floor) {
         this.setDirection(direction);

@@ -10,7 +10,7 @@ import java.io.IOException;
 public class JsonConfiguration implements BuildingConfigurable {
     private int elevatorSpeedInMilliseconds;
     private int elevatorCapacity;
-    private int returnToFirstFloorAfter;
+    private int returnToDefaultFloorTimeout;
     private int numberOfElevators;
     private int doorOpenTime;
     private int numberOfFloors;
@@ -21,7 +21,7 @@ public class JsonConfiguration implements BuildingConfigurable {
             parseAndSetConfigurationJSON(configurationFilePath);
             elevatorSpeedInMilliseconds = getConfigurationFieldFromJSON("elevatorSpeedInMilliseconds");
             elevatorCapacity = getConfigurationFieldFromJSON("elevatorPersonCapacity");
-            returnToFirstFloorAfter = getConfigurationFieldFromJSON("returnToFirstFloorAfter");
+            returnToDefaultFloorTimeout = getConfigurationFieldFromJSON("returnToDefaultFloorTimeout");
             numberOfElevators = getConfigurationFieldFromJSON("elevators");
             doorOpenTime = getConfigurationFieldFromJSON("doorOpenTime");
             numberOfFloors = getConfigurationFieldFromJSON("floors");
@@ -40,8 +40,8 @@ public class JsonConfiguration implements BuildingConfigurable {
         return elevatorCapacity;
     }
 
-    public int getReturnToFirstFloorAfter() {
-        return returnToFirstFloorAfter;
+    public int getReturnToDefaultFloorTimeout() {
+        return returnToDefaultFloorTimeout;
     }
 
     public int getDoorOpenTime() {

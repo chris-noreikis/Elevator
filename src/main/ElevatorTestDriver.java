@@ -18,7 +18,7 @@ public class ElevatorTestDriver {
     private boolean TEST_MODE = true;
     private ArrayList<Person> people;
 
-    void runTests() throws InterruptedException, InvalidStateException {
+    void runTests() throws InterruptedException, InvalidStateException, InvalidValueException {
         testOne();
         testTwo();
         testThree();
@@ -28,7 +28,7 @@ public class ElevatorTestDriver {
     }
 
     @BeforeEach
-    void resetState() {
+    void resetState() throws InvalidValueException {
         Building.getInstance().resetState();
         ElevatorController.getInstance().resetState();
         people = new ArrayList<>();
@@ -36,7 +36,7 @@ public class ElevatorTestDriver {
 
     @Test
     @DisplayName("Test case 1 - Single rider request")
-    void testOne() throws InterruptedException, InvalidStateException {
+    void testOne() throws InterruptedException, InvalidStateException, InvalidValueException {
         for (int time = 0; time < 50; time++) {
 
             if (time == 0) {
@@ -45,14 +45,15 @@ public class ElevatorTestDriver {
 
             moveElevators(1000);
         }
+
         if (TEST_MODE) {
-            assertEquals(people.get(0), Building.getInstance().getFloor(9).getDonePerson(0));
+            assertEquals(people.get(0), Building.getInstance().getFloor(10).getDonePerson(0));
         }
     }
 
     @Test
     @DisplayName("Test case 2 - Pick up rider going in same direction, direction is UP")
-    void testTwo() throws InterruptedException, InvalidStateException {
+    void testTwo() throws InterruptedException, InvalidStateException, InvalidValueException {
         for (int time = 0; time < 70; time++) {
 
             if (time == 0) {
@@ -67,14 +68,14 @@ public class ElevatorTestDriver {
         }
 
         if (TEST_MODE) {
-            assertEquals(people.get(0), Building.getInstance().getFloor(4).getDonePerson(0));
-            assertEquals(people.get(1), Building.getInstance().getFloor(18).getDonePerson(0));
+            assertEquals(people.get(0), Building.getInstance().getFloor(5).getDonePerson(0));
+            assertEquals(people.get(1), Building.getInstance().getFloor(19).getDonePerson(0));
         }
     }
 
     @Test
     @DisplayName("Test case 3 - Pick up rider going in same direction, direction is DOWN")
-    void testThree() throws InterruptedException, InvalidStateException {
+    void testThree() throws InterruptedException, InvalidStateException, InvalidValueException {
         for (int time = 0; time < 70; time++) {
 
             if (time == 0) {
@@ -89,14 +90,14 @@ public class ElevatorTestDriver {
         }
 
         if (TEST_MODE) {
-            assertEquals(people.get(0), Building.getInstance().getFloor(0).getDonePerson(0));
-            assertEquals(people.get(1), Building.getInstance().getFloor(0).getDonePerson(1));
+            assertEquals(people.get(0), Building.getInstance().getFloor(1).getDonePerson(0));
+            assertEquals(people.get(1), Building.getInstance().getFloor(1).getDonePerson(1));
         }
     }
 
     @Test
     @DisplayName("Test case 4 - Elevator picks up request when responding to idle timeout, handles multiple up requests")
-    void testFour() throws InterruptedException, InvalidStateException {
+    void testFour() throws InterruptedException, InvalidStateException, InvalidValueException {
         for (int time = 0; time < 80; time++) {
 
             if (time == 0) {
@@ -119,16 +120,16 @@ public class ElevatorTestDriver {
         }
 
         if (TEST_MODE) {
-            assertEquals(people.get(0), Building.getInstance().getFloor(9).getDonePerson(0));
-            assertEquals(people.get(1), Building.getInstance().getFloor(16).getDonePerson(0));
-            assertEquals(people.get(2), Building.getInstance().getFloor(8).getDonePerson(0));
-            assertEquals(people.get(3), Building.getInstance().getFloor(0).getDonePerson(0));
+            assertEquals(people.get(0), Building.getInstance().getFloor(10).getDonePerson(0));
+            assertEquals(people.get(1), Building.getInstance().getFloor(17).getDonePerson(0));
+            assertEquals(people.get(2), Building.getInstance().getFloor(9).getDonePerson(0));
+            assertEquals(people.get(3), Building.getInstance().getFloor(1).getDonePerson(0));
         }
     }
 
     @Test
     @DisplayName("Test case 5 - Rider enters down request from 5th floor")
-    void testFive() throws InterruptedException, InvalidStateException {
+    void testFive() throws InterruptedException, InvalidStateException, InvalidValueException {
         for (int time = 0; time < 40; time++) {
             if (time == 0) {
                 addPerson(5, 1, 1);
@@ -137,7 +138,33 @@ public class ElevatorTestDriver {
         }
 
         if (TEST_MODE) {
-            assertEquals(people.get(0), Building.getInstance().getFloor(0).getDonePerson(0));
+            assertEquals(people.get(0), Building.getInstance().getFloor(1).getDonePerson(0));
+        }
+    }
+
+    @Test
+    @DisplayName("Test case 6 - Rider enters down request from 5th floor")
+    void testSix() throws InterruptedException, InvalidStateException, InvalidValueException {
+        for (int time = 0; time < 80; time++) {
+            if (time == 0) {
+                addPerson(8, 4, 1);
+            }
+
+            if (time == 3) {
+                addPerson(4, 9, 1);
+            }
+
+            if (time == 20) {
+                addPerson(5, 15, 1);
+            }
+
+            moveElevators(1000);
+        }
+
+        if (TEST_MODE) {
+            assertEquals(people.get(0), Building.getInstance().getFloor(4).getDonePerson(0));
+            assertEquals(people.get(1), Building.getInstance().getFloor(9).getDonePerson(0));
+            assertEquals(people.get(2), Building.getInstance().getFloor(15).getDonePerson(0));
         }
     }
 
@@ -153,20 +180,16 @@ public class ElevatorTestDriver {
         }
     }
 
-    private void addPerson(int start, int end, int elevId) {
-        try {
-            ElevatorDisplay.Direction d = end > start ? ElevatorDisplay.Direction.UP : ElevatorDisplay.Direction.DOWN;
-            Person p = new Person(start, end, "P" + personCounter++);
-            people.add(p);
-            Building.getInstance().addPerson(p, start);
-            ElevatorController.getInstance().getElevator(elevId).addFloorRequest(new ElevatorRequest(d, start));
-            ElevatorLogger.getInstance().logAction("Person " + p.getId() + " pressed " + d + " on Floor " + start);
-        } catch (InvalidValueException ex) {
-            ex.printStackTrace();
-        }
+    private void addPerson(int start, int end, int elevId) throws InvalidValueException {
+        ElevatorDisplay.Direction d = end > start ? ElevatorDisplay.Direction.UP : ElevatorDisplay.Direction.DOWN;
+        Person p = new Person(start, end, "P" + personCounter++);
+        people.add(p);
+        Building.getInstance().addPerson(p, start);
+        ElevatorController.getInstance().getElevator(elevId).addFloorRequest(new ElevatorRequest(d, start));
+        ElevatorLogger.getInstance().logAction("Person " + p.getId() + " pressed " + d + " on Floor " + start);
     }
 
-    private void report() {
+    private void report() throws InvalidValueException {
         System.out.println("");
         System.out.println(Building.getInstance());
         System.out.println("");

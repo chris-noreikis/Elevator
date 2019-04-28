@@ -1,18 +1,17 @@
 package models;
 
-import gui.ElevatorDisplay.Direction;
 import exceptions.*;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 public class Person {
     private int startFloor;
     private int endFloor;
     private String id;
-    private int personWaitTime;
 
-    public Person(int startFloor, int endFloor, String id) {
+    public Person(int startFloor, int endFloor, String id) throws InvalidValueException {
         setStartFloor(startFloor);
         setEndFloor(endFloor);
-        setID(id);
+        setId(id);
     }
 
     public int getStartFloor() {
@@ -22,41 +21,30 @@ public class Person {
     public int getEndFloor() {
         return endFloor;
     }
-    
-    public int getWaitTime() {
-    	return personWaitTime;
-    }
 
     public String getId() { return id; }
 
-    public boolean isDirectionUp() {
-        return getStartFloor() < getEndFloor();
+    private void setId(String idIn) {
+        this.id = idIn;
     }
 
-    private Direction getDirection() { return isDirectionUp() ? Direction.UP : Direction.DOWN; }
+    public boolean isAtDestinationFloor(int floorNum) throws InvalidValueException {
+        Building.getInstance().validateFloor("Person asked for invalid destination floor", floorNum);
 
-    public ElevatorRequest pressButtonOnFloor(Floor f) {
-        f.addWaitingPerson(this);
-        return new ElevatorRequest(getDirection(), getStartFloor());
-    }
-
-    private void setStartFloor(int startFloor) {
-        this.startFloor = startFloor;
-    }
-
-    private void setEndFloor(int endFloor) {
-        this.endFloor = endFloor;
-    }
-
-    private void setID(String ID) {
-        this.id = ID;
-    }
-
-    public boolean isAtDestinationFloor(int floorNum) {
         return floorNum == getEndFloor();
     }
 
     public String toString() {
         return getId();
+    }
+
+    private void setStartFloor(int startFloor) throws InvalidValueException  {
+        Building.getInstance().validateFloor("Person set to invalid start floor", startFloor);
+        this.startFloor = startFloor;
+    }
+
+    private void setEndFloor(int endFloor) throws InvalidValueException{
+        Building.getInstance().validateFloor("Person set to invalid end floor", endFloor);
+        this.endFloor = endFloor;
     }
 }

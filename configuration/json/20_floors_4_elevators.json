@@ -4,5 +4,5 @@
   "elevatorPersonCapacity": 15,
   "elevatorSpeedInMilliseconds": 1000,
   "doorOpenTime": 3000,
-  "returnToFirstFloorAfter": 60000
+  "returnToDefaultFloorTimeout": 60000
 }

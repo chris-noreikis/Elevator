@@ -10,8 +10,7 @@ public class ElevatorController {
     private ArrayList<Elevator> elevators;
     private static ElevatorController instance;
 
-    public static ElevatorController getInstance()
-    {
+    public static ElevatorController getInstance() throws InvalidValueException {
         if (instance == null) {
             instance = new ElevatorController();
         }
@@ -19,15 +18,19 @@ public class ElevatorController {
     }
 
 
-    private ElevatorController() {
+    private ElevatorController() throws InvalidValueException {
         setupElevators();
     }
 
-    private void setupElevators() {
-        int numElevators = Building.getInstance().getNumElevators();
+    private void setupElevators() throws InvalidValueException {
+        int numElevators = Building.getInstance().getNumberOfElevators();
+        int elevatorCapacity = Building.getInstance().getElevatorCapacity();
+        int elevatorSpeed = Building.getInstance().getElevatorSpeed();
+        int doorOpenTime = Building.getInstance().getDoorOpenTime();
+        int returnToFirstFloorAfter = Building.getInstance().getReturnToDefaultFloorTimeout();
         elevators = new ArrayList<>();
         for (int elevatorID = 1; elevatorID <= numElevators; elevatorID++) {
-            elevators.add(new Elevator(elevatorID, 10, 1000, 2000, 10000));
+            elevators.add(new Elevator(elevatorID, elevatorCapacity, elevatorSpeed, doorOpenTime, returnToFirstFloorAfter));
             ElevatorDisplay.getInstance().addElevator(elevatorID, 1);
         }
     }
@@ -42,7 +45,7 @@ public class ElevatorController {
         }
     }
 
-    public void resetState() {
+    public void resetState() throws InvalidValueException {
         for (Elevator e : elevators) {
             e.resetState();
         }

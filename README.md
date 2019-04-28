@@ -15,6 +15,4 @@
 - [x] Floor movement algorithm in elevator
 - [ ] Exception throwing / handling for public methods
 - [ ] Figure out what to do when elevator is at capacity.  Ignore request?  Re-queue floor request?
-- [ ] Add avg time waiting to person class
-- [ ] Add Person ride time duration
 

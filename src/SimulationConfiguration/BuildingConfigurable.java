@@ -5,7 +5,7 @@ public interface BuildingConfigurable {
 
     public int getElevatorCapacity();
 
-    public int getReturnToFirstFloorAfter();
+    public int getReturnToDefaultFloorTimeout();
 
     public int getDoorOpenTime();
 
