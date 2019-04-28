@@ -1,7 +1,7 @@
 package models;
 
 import exceptions.*;
-import org.omg.CORBA.DynAnyPackage.Invalid;
+import gui.ElevatorDisplay.Direction;
 
 public class Person {
     private int startFloor;
@@ -32,6 +32,14 @@ public class Person {
         Building.getInstance().validateFloor("Person asked for invalid destination floor", floorNum);
 
         return floorNum == getEndFloor();
+    }
+
+    public boolean isTravellingInSameDirection(Direction d) {
+        if (startFloor < endFloor) {
+            return d == Direction.UP;
+        } else {
+            return d == Direction.DOWN;
+        }
     }
 
     public String toString() {

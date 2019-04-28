@@ -143,7 +143,7 @@ public class ElevatorTestDriver {
     }
 
     @Test
-    @DisplayName("Test case 6 - Rider enters down request from 5th floor")
+    @DisplayName("Test case 6 - Elevator goes as far as it can go in a certain direction")
     void testSix() throws InterruptedException, InvalidStateException, InvalidValueException {
         for (int time = 0; time < 80; time++) {
             if (time == 0) {

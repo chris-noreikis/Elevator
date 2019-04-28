@@ -4,7 +4,6 @@ import exceptions.InvalidStateException;
 import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
 import gui.ElevatorDisplay.Direction;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -203,36 +202,39 @@ public class Elevator {
     }
 
     private void removeFloorRequests(Floor f) {
-        ArrayList<ElevatorRequest> filteredFloorRequests = new ArrayList<>();
-        for (ElevatorRequest request : floorRequests) {
-            if (request.getDirection() == getElevatorDirection() && request.getFloorNumber() == f.getFloorNumber()) {
-                continue;
-            }
-
-            filteredFloorRequests.add(request);
-        }
-        floorRequests = filteredFloorRequests;
+        floorRequests.removeIf(request -> request.getDirection() == getElevatorDirection() && request.getFloorNumber() == f.getFloorNumber());
     }
 
-    private void movePeopleFromFloorToElevator() {
+    private void movePeopleFromFloorToElevator() throws InvalidValueException {
         ElevatorLogger.getInstance()
                 .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
 
         Floor f = Building.getInstance().getFloor(currentFloor);
         removeFloorRequests(f);
-        for (int i = 0; i < f.getNumberOfWaitingPersons(); i++) {
-            f.movePersonFromFloorToElevator(i, this);
-            Person justAddedPerson = peopleOnElevator.get(peopleOnElevator.size() - 1);
-            ElevatorLogger.getInstance().logAction("Person " + justAddedPerson.getId() + " entered Elevator " + getId() + " " + getRidersText());
-            Direction d = getDirection(justAddedPerson.getEndFloor(), justAddedPerson.getStartFloor());
-            ElevatorRequest newRequest = new ElevatorRequest(d, justAddedPerson.getEndFloor());
-            if (!riderRequests.contains(newRequest)) {
-                riderRequests.add(newRequest);
+
+        ArrayList<Person> movedPeople = new ArrayList<>();
+        for (int i = 0; i < f.getNumberOfPeopleInLine(); i++) {
+            Person p = f.getPersonInLine(i);
+            if (p.isTravellingInSameDirection(getElevatorDirection()) && isElevatorOpenCapacity()) {
+                movedPeople.add(p);
+                peopleOnElevator.add(p);
+                ElevatorLogger.getInstance().logAction("Person " + p.getId() + " entered Elevator " + getId() + " " + getRidersText());
+                Direction d = getDirection(p.getEndFloor(), p.getStartFloor());
+                ElevatorRequest newRequest = new ElevatorRequest(d, p.getEndFloor());
+                if (!riderRequests.contains(newRequest)) {
+                    riderRequests.add(newRequest);
+                }
+                ElevatorLogger.getInstance().logAction("Elevator " + getId() +
+                        " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
             }
-            ElevatorLogger.getInstance().logAction("Elevator " + getId() +
-                    " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
+        }
+
+        for (Person p : movedPeople) {
+            f.removeWaitingPerson(p);
         }
     }
+
+    private boolean isElevatorOpenCapacity() { return peopleOnElevator.size() < getCapacity(); }
 
     private void movePeopleFromElevatorToFloor() throws InvalidValueException {
         ArrayList<ElevatorRequest> filteredRiderRequests = new ArrayList<>();

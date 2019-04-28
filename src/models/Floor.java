@@ -29,22 +29,26 @@ public class Floor {
         return donePersons.get(personIndex);
     }
 
-    public void movePersonFromFloorToElevator(int personIndex, Elevator e) {
-        Person personToAdd = waitingPersons.get(personIndex);
-        e.pickUpPassenger(personToAdd);
-        removeWaitingPerson(personIndex);
-    }
+    public void addDonePerson(Person p) throws InvalidValueException {
+        if (donePersons.contains(p)) {
+            throw new InvalidValueException("Person " + p + " is already on floor " + getFloorNumber());
+        }
 
-    public void addDonePerson(Person p) {
         donePersons.add(p);
     }
 
-    public int getNumberOfWaitingPersons() {
+    public int getNumberOfPeopleInLine() {
         return waitingPersons.size();
     }
 
-    private void removeWaitingPerson(int personIndex) {
-        waitingPersons.remove(personIndex);
+    public Person getPersonInLine(int spotInLine) { return waitingPersons.get(spotInLine); }
+
+    public void removeWaitingPerson(Person p) throws InvalidValueException {
+        if (!waitingPersons.contains(p)) {
+            throw new InvalidValueException("Floor " + getFloorNumber() + " does not contain waiting person " + p);
+        }
+
+        waitingPersons.remove(p);
     }
 
     public int getFloorNumber() { return floorNumber; }
