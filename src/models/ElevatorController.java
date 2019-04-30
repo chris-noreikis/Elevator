@@ -34,8 +34,9 @@ public class ElevatorController {
             ElevatorDisplay.getInstance().addElevator(elevatorID, 1);
         }
     }
+    
 
-    public Elevator getElevator(int id) {
+    public Elevator getElevator(int id) throws InvalidValueException {
         return elevators.get(id - 1);
     }
 
@@ -60,4 +61,5 @@ public class ElevatorController {
         }
         return output;
     }
+	
 }
