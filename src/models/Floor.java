@@ -1,7 +1,7 @@
 package models;
 
 import exceptions.InvalidValueException;
-
+import gui.*;
 import java.util.ArrayList;
 import java.lang.*;
 
@@ -11,8 +11,6 @@ public class Floor {
     private int floorNumber;
 
     public Floor(int floorNumberIn) {
-//        Building.getInstance().validateFloor(floorNumber);
-
         waitingPersons = new ArrayList<>();
         donePersons = new ArrayList<>();
         floorNumber = floorNumberIn;

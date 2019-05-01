@@ -1,6 +1,8 @@
 
 package main;
 
+import com.sun.javafx.scene.traversal.Direction;
+
 import exceptions.InvalidStateException;
 import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
@@ -28,6 +30,7 @@ public class Main {
 
         int numFloor = 20;
         int numElev = 4;
+        
         ElevatorDisplay.getInstance().initialize(numFloor);
         for (int i = 1; i <= numElev; i++) {
             ElevatorDisplay.getInstance().addElevator(i, 1);
@@ -67,7 +70,7 @@ public class Main {
 
     private static void moveElevator(int elevNum, int fromFloor, int toFloor) throws InterruptedException {
         int numRiders = (int) (11.0 * Math.random()) + 1;
-
+        
         ElevatorDisplay.getInstance().closeDoors(elevNum);
         if (fromFloor < toFloor) {
             for (int i = fromFloor; i <= toFloor; i++) {

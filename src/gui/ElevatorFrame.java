@@ -5,6 +5,8 @@
 package gui;
 
 import gui.ElevatorDisplay.Direction;
+import models.Building;
+
 import java.util.HashMap;
 
 /**
@@ -55,6 +57,10 @@ public class ElevatorFrame extends javax.swing.JFrame {
 
     public void closeDoors(int id) {
         getPanel(id).closeDoors();
+    }
+    
+    public int getMaxFloor() {
+    	return maxFloors;
     }
 
     /**
