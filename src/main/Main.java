@@ -13,9 +13,8 @@ import models.*;
  *
  */
 public class Main {
-  /*  public static void main(String[] args) throws InterruptedException {
-        ElevatorTestDriver d = new ElevatorTestDriver();
-
+  public static void main(String[] args) throws InterruptedException {
+        ElevatorTestDriver2 d = new ElevatorTestDriver2();
         try {
             d.runTests();
         } catch (InvalidStateException e) {
@@ -24,9 +23,9 @@ public class Main {
         } catch (InvalidValueException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
-        public static void main(String[] args) throws InterruptedException {
+    /*    public static void main(String[] args) throws InterruptedException {
 
         int numFloor = 20;
         int numElev = 4;
@@ -84,5 +83,5 @@ public class Main {
             }
         }
         ElevatorDisplay.getInstance().openDoors(elevNum);
-    }
+    }*/
 }

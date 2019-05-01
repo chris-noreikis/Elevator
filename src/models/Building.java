@@ -25,19 +25,19 @@ public class Building {
         return null;
     }
 
-    public static Building getInstance() {
+    public static Building getInstance() throws InvalidValueException{
         if (instance == null) {
             instance = new Building();
         }
         return instance;
     }
 
-    private Building() {
+    private Building() throws InvalidValueException{
         ElevatorDisplay.getInstance().initialize(getNumberOfFloors());
         setupFloors();
     }
 
-    private void setupFloors() {
+    private void setupFloors() throws InvalidValueException {
         int numberOfFloors = buildingConfiguration.getNumberOfFloors();
         floors = new ArrayList<>();
         for (int i = 0; i < numberOfFloors; i++) {

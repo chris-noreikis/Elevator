@@ -35,7 +35,9 @@ public class Floor {
     		return donePersons.get(personIndex);
     	}
     	catch(IndexOutOfBoundsException e){
+    		System.out.println(donePersons.size());
     		throw new InvalidValueException("Person Index out of bounds.");
+    		
     	}
     }
 
