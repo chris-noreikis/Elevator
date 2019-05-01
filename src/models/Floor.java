@@ -10,10 +10,17 @@ public class Floor {
     private ArrayList<Person> donePersons;
     private int floorNumber;
 
-    public Floor(int floorNumberIn) {
+    public Floor(int floorNumber) throws InvalidValueException {
         waitingPersons = new ArrayList<>();
         donePersons = new ArrayList<>();
-        floorNumber = floorNumberIn;
+        setFloorNumber(floorNumber);
+    }
+    
+    private void setFloorNumber(int floorNumber) throws InvalidValueException {
+    	if(floorNumber <= 0) {
+    		throw new InvalidValueException("Floor number is less than or equal to 0.");
+    	}
+    	this.floorNumber = floorNumber;
     }
 
     public void addWaitingPerson(Person p) throws InvalidValueException {
@@ -23,8 +30,13 @@ public class Floor {
         waitingPersons.add(p);
     }
 
-    public Person getDonePerson(int personIndex) {
-        return donePersons.get(personIndex);
+    public Person getDonePerson(int personIndex) throws InvalidValueException{
+    	try {
+    		return donePersons.get(personIndex);
+    	}
+    	catch(IndexOutOfBoundsException e){
+    		throw new InvalidValueException("Person Index out of bounds.");
+    	}
     }
 
     public void addDonePerson(Person p) throws InvalidValueException {
@@ -39,7 +51,14 @@ public class Floor {
         return waitingPersons.size();
     }
 
-    public Person getPersonInLine(int spotInLine) { return waitingPersons.get(spotInLine); }
+    public Person getPersonInLine(int spotInLine) throws InvalidValueException{ 
+    	try {
+    		return waitingPersons.get(spotInLine);
+    	}
+    	catch(IndexOutOfBoundsException e){
+    		throw new InvalidValueException("Spot in line nonexistent.");
+    	} 
+    }
 
     public void removeWaitingPerson(Person p) throws InvalidValueException {
         if (!waitingPersons.contains(p)) {

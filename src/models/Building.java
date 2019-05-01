@@ -45,7 +45,10 @@ public class Building {
         }
     }
 
-    public Floor getFloor(int floorNumber) {
+    public Floor getFloor(int floorNumber) throws InvalidValueException {
+    	if(floorNumber <= 0 || floorNumber > this.getNumberOfFloors()) {
+    		throw new InvalidValueException("Floor number is not a valid floor");
+    	}
         return floors.get(floorNumber - 1);
     }
 

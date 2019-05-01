@@ -24,8 +24,8 @@ public class Main {
         } catch (InvalidValueException e) {
             e.printStackTrace();
         }
-    }
-*/
+    }*/
+
         public static void main(String[] args) throws InterruptedException {
 
         int numFloor = 20;
@@ -74,12 +74,12 @@ public class Main {
         ElevatorDisplay.getInstance().closeDoors(elevNum);
         if (fromFloor < toFloor) {
             for (int i = fromFloor; i <= toFloor; i++) {
-                ElevatorDisplay.getInstance().updateElevator(elevNum, i, numRiders, UP);
+                ElevatorDisplay.getInstance().updateElevator(elevNum, i, numRiders, ElevatorDisplay.Direction.UP);
                 Thread.sleep(80);
             }
         } else {
             for (int i = fromFloor; i >= toFloor; i--) {
-                ElevatorDisplay.getInstance().updateElevator(elevNum, i, numRiders, DOWN);
+                ElevatorDisplay.getInstance().updateElevator(elevNum, i, numRiders, ElevatorDisplay.Direction.DOWN);
                 Thread.sleep(80);
             }
         }

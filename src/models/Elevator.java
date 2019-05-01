@@ -143,7 +143,11 @@ public class Elevator {
         ElevatorDisplay.getInstance().updateElevator(getId(), getCurrentFloor(), getPeopleOnElevator().size(), getElevatorDirection());
     }
 
-    public void pickUpPassenger(Person p) {
+    public void pickUpPassenger(Person p) throws InvalidValueException
+    {
+    	if(p == null) {
+    		throw new InvalidValueException("Person is null.");
+    	}
         this.peopleOnElevator.add(p);
     }
 

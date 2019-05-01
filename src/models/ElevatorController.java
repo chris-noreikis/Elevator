@@ -35,7 +35,9 @@ public class ElevatorController {
         }
     }
     
-
+    
+    // TODO why throw an error?
+    // If so, whats the range of id?
     public Elevator getElevator(int id) throws InvalidValueException {
         return elevators.get(id - 1);
     }
