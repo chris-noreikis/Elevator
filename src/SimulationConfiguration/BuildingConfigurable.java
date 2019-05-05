@@ -1,7 +1,7 @@
 package SimulationConfiguration;
 
 public interface BuildingConfigurable {
-    public int getElevatorSpeedInMilliseconds();
+    public int getElevatorSpeed();
 
     public int getElevatorCapacity();
 

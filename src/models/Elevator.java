@@ -1,40 +1,36 @@
 package models;
 
-import exceptions.InvalidStateException;
-import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
 import gui.ElevatorDisplay.Direction;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static java.util.stream.Collectors.joining;
-
 public class Elevator {
-    private int id;
-    private boolean isDoorOpen;
-    private int currentFloor;
     private ArrayList<ElevatorRequest> floorRequests;
     private ArrayList<ElevatorRequest> riderRequests;
     private ArrayList<Person> peopleOnElevator;
 
-    private Direction elevatorDirection;
+    private int id;
+    private boolean isDoorOpen;
+    private int currentFloor;
     private int capacity;
-    private int elevatorSpeedInMilliseconds;
-    private int doorOpenTimeInMilliseconds;
+    private int elevatorSpeed;
+    private int doorOpenTime;
     private int returnToDefaultFloorTimeout;
     private int timeUntilDoorsClose = 0;
-    private int timeLeftOnFloor = 0;
-    private int idleCount = 0;
+    private int timeUntilNextFloor = 0;
+    private int idleTimeout = 0;
+    private Direction elevatorDirection;
 
-    public Elevator(int id, int capacity, int elevatorSpeedInMilliseconds, int doorOpenTimeInMilliseconds, int returnToDefaultFloorTimeout) throws InvalidValueException {
+    public Elevator(int id, int capacity, int elevatorSpeed, int doorOpenTime, int returnToDefaultFloorTimeout) throws InvalidValueException {
         setIsDoorOpen(false);
         setCurrentFloor(1);
         setId(id);
         setCapacity(capacity);
         setElevatorDirection(Direction.IDLE);
-        setElevatorSpeedInMilliseconds(elevatorSpeedInMilliseconds);
-        setDoorOpenTimeInMilliseconds(doorOpenTimeInMilliseconds);
+        setElevatorSpeed(elevatorSpeed);
+        setDoorOpenTime(doorOpenTime);
         setReturnToDefaultFloorTimeout(returnToDefaultFloorTimeout);
         floorRequests = new ArrayList<>();
         riderRequests = new ArrayList<>();
@@ -42,9 +38,7 @@ public class Elevator {
     }
 
     public void addFloorRequest(ElevatorRequest elevatorRequest) throws InvalidValueException {
-        if (elevatorRequest.getFloorNumber() < 1 || elevatorRequest.getFloorNumber() > Building.getInstance().getNumberOfFloors()) {
-            throw new InvalidValueException("Invalid floor request: " + elevatorRequest.getFloorNumber());
-        }
+        Building.getInstance().checkFloor("Invalid floor request: ", elevatorRequest.getFloorNumber());
 
         int requestFloorElevator = elevatorRequest.getFloorNumber();
         if (getFloorRequests().contains(elevatorRequest)) {
@@ -52,29 +46,27 @@ public class Elevator {
         }
 
         if (getElevatorDirection() == Direction.IDLE) {
-            setElevatorDirection(getDirection(requestFloorElevator, getCurrentFloor()));
+            Direction dir = ElevatorDirection.determineDirection(getCurrentFloor(), requestFloorElevator);
+            setElevatorDirection(dir);
         }
 
         floorRequests.add(elevatorRequest);
 
-        String action = "Elevator " + getId() + " is going to floor " + elevatorRequest.getFloorNumber() +
+        String action = "Elevator " + getId() + " is going to Floor " + elevatorRequest.getFloorNumber() +
                 " for " + elevatorRequest.getDirection() + " request " + getRequestText();
         ElevatorLogger.getInstance().logAction(action);
     }
 
-    public void doTimeSlice(int time) throws InvalidValueException, InvalidStateException {
+    public void doTimeSlice(int time) throws InvalidValueException {
         if (time < 0) {
             throw new InvalidValueException("Elevator told to move with invalid time: " + time);
         }
 
-        if (getTimeUntilDoorsClose() > 0 || getTimeLeftOnFloor() > 0) {
-            int nextDoorCloseTime = Math.max(getTimeUntilDoorsClose() - time, 0);
-            setTimeUntilDoorsClose(nextDoorCloseTime);
-            int nextTimeLeftOnFloorTime = Math.max(getTimeLeftOnFloor() - time, 0);
-            setTimeLeftOnFloor(nextTimeLeftOnFloorTime);
+        if (getTimeUntilDoorsClose() > 0 || getTimeUntilNextFloor() > 0) {
+            decrementWaitTimes(time);
         }
 
-        if (getTimeUntilDoorsClose() > 0 || getTimeLeftOnFloor() > 0) {
+        if (getTimeUntilDoorsClose() > 0 || getTimeUntilNextFloor() > 0) {
             return;
         }
 
@@ -84,10 +76,11 @@ public class Elevator {
         }
 
         if (isRequestPoolEmpty() && getElevatorDirection() == Direction.IDLE && getCurrentFloor() != 1) {
-            int idleCount = getIdleCount();
+            int idleCount = getIdleTimeout();
             idleCount += time;
+            setIdleTimeout(idleCount);
             if (idleCount >= getReturnToDefaultFloorTimeout()) {
-                setIdleCount(0);
+                setIdleTimeout(0);
                 addFloorRequest(new ElevatorRequest(Direction.UP, 1));
             }
         }
@@ -95,11 +88,19 @@ public class Elevator {
         setToIdleIfNoMoreRequests();
 
         if (!isRequestPoolEmpty()) {
-            move();
+            respondToRequests();
         }
     }
 
-    private void move() throws InvalidStateException, InvalidValueException {
+    private void decrementWaitTimes(int time) throws InvalidValueException {
+        int nextDoorCloseTime = Math.max(getTimeUntilDoorsClose() - time, 0);
+        setTimeUntilDoorsClose(nextDoorCloseTime);
+
+        int nextTimeLeftOnFloorTime = Math.max(getTimeUntilNextFloor() - time, 0);
+        setTimeUntilNextFloor(nextTimeLeftOnFloorTime);
+    }
+
+    private void respondToRequests() throws InvalidValueException {
         setDirectionIfTopOrBottomFloor();
 
         boolean hasFloorRequest = floorHasFloorRequest();
@@ -107,7 +108,7 @@ public class Elevator {
 
         if (hasFloorRequest || hasRiderRequest) {
             openDoors();
-            setTimeUntilDoorsClose(getDoorOpenTimeInMilliseconds());
+            setTimeUntilDoorsClose(getDoorOpenTime());
             if (hasRiderRequest) {
                 movePeopleFromElevatorToFloor();
             }
@@ -115,19 +116,16 @@ public class Elevator {
             if (hasFloorRequest) {
                 movePeopleFromFloorToElevator();
             }
-
         } else {
-            if (getIsDoorOpen()) {
-                throw new InvalidStateException("Elevator in motion with open doors");
-            }
-
-            setTimeLeftOnFloor(getElevatorSpeedInMilliseconds());
-            int nextFloor = getElevatorDirection() == Direction.UP ? currentFloor + 1 : currentFloor - 1;
-            ElevatorLogger.getInstance()
-                    .logAction("Elevator " + getId() + " moving from floor " + currentFloor + " to floor " + nextFloor + " " + getRequestText());
-            setCurrentFloor(nextFloor);
+            moveToNextRequest();
         }
 
+        setNextElevatorDirection();
+
+        ElevatorDisplay.getInstance().updateElevator(getId(), getCurrentFloor(), getPeopleOnElevator().size(), getElevatorDirection());
+    }
+
+    private void setNextElevatorDirection() {
         ArrayList<ElevatorRequest> sortedRequests = getSortedRequests();
         if (!sortedRequests.isEmpty()) {
             int nextRequestFloorNumber = sortedRequests.get(0).getFloorNumber();
@@ -139,16 +137,14 @@ public class Elevator {
                 setElevatorDirection(sortedRequests.get(0).getDirection());
             }
         }
-
-        ElevatorDisplay.getInstance().updateElevator(getId(), getCurrentFloor(), getPeopleOnElevator().size(), getElevatorDirection());
     }
 
-    public void pickUpPassenger(Person p) throws InvalidValueException
-    {
-    	if(p == null) {
-    		throw new InvalidValueException("Person is null.");
-    	}
-        this.peopleOnElevator.add(p);
+    private void moveToNextRequest() throws InvalidValueException {
+        setTimeUntilNextFloor(getElevatorSpeed());
+        int nextFloor = getElevatorDirection() == Direction.UP ? currentFloor + 1 : currentFloor - 1;
+        ElevatorLogger.getInstance()
+                .logAction("Elevator " + getId() + " moving from Floor " + currentFloor + " to Floor " + nextFloor + " " + getRequestText());
+        setCurrentFloor(nextFloor);
     }
 
     private void setToIdleIfNoMoreRequests() {
@@ -178,6 +174,7 @@ public class Elevator {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -198,7 +195,7 @@ public class Elevator {
 
         sortedRequests.sort((o1, o2) -> o2.getFloorNumber() - o1.getFloorNumber());
 
-        if (getElevatorDirection() == Direction.UP) {
+        if (getElevatorDirection() == Direction.DOWN) {
             Collections.reverse(sortedRequests);
         }
 
@@ -210,21 +207,21 @@ public class Elevator {
     }
 
     private void movePeopleFromFloorToElevator() throws InvalidValueException {
+        Floor floor = Building.getInstance().getFloor(currentFloor);
+        removeFloorRequests(floor);
+
         ElevatorLogger.getInstance()
                 .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
 
-        Floor f = Building.getInstance().getFloor(currentFloor);
-        removeFloorRequests(f);
-
         ArrayList<Person> movedPeople = new ArrayList<>();
-        for (int i = 0; i < f.getNumberOfPeopleInLine(); i++) {
-            Person p = f.getPersonInLine(i);
-            if (p.isTravellingInSameDirection(getElevatorDirection()) && isElevatorOpenCapacity()) {
+        for (int i = 0; i < floor.getNumberOfPeopleInLine(); i++) {
+            Person p = floor.getPersonInLine(i);
+            if (p.isDirectionOfTravel(getElevatorDirection()) && isElevatorSpaceAvailable()) {
                 movedPeople.add(p);
                 peopleOnElevator.add(p);
                 ElevatorLogger.getInstance().logAction("Person " + p.getId() + " entered Elevator " + getId() + " " + getRidersText());
-                Direction d = getDirection(p.getEndFloor(), p.getStartFloor());
-                ElevatorRequest newRequest = new ElevatorRequest(d, p.getEndFloor());
+                Direction dir = ElevatorDirection.determineDirection(p.getStartFloor(), p.getEndFloor());
+                ElevatorRequest newRequest = new ElevatorRequest(dir, p.getEndFloor());
                 if (!riderRequests.contains(newRequest)) {
                     riderRequests.add(newRequest);
                 }
@@ -234,13 +231,17 @@ public class Elevator {
         }
 
         for (Person p : movedPeople) {
-            f.removeWaitingPerson(p);
+            floor.removeWaitingPerson(p);
         }
     }
 
-    private boolean isElevatorOpenCapacity() { return peopleOnElevator.size() < getCapacity(); }
+    private boolean isElevatorSpaceAvailable() {
+        return peopleOnElevator.size() < getCapacity();
+    }
 
     private void movePeopleFromElevatorToFloor() throws InvalidValueException {
+        ElevatorLogger.getInstance()
+                .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Rider Request " + getRequestText());
         ArrayList<ElevatorRequest> filteredRiderRequests = new ArrayList<>();
         for (ElevatorRequest request : riderRequests) {
             if (request.getFloorNumber() == currentFloor) {
@@ -257,14 +258,13 @@ public class Elevator {
                 peopleOnElevator.remove(p);
                 ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getId() + " " + getRidersText());
                 Building.getInstance().getFloor(currentFloor).addDonePerson(p);
-                continue;
             }
         }
     }
 
-    private void openDoors() throws InvalidStateException {
+    private void openDoors() throws InvalidValueException {
         if (getIsDoorOpen()) {
-            throw new InvalidStateException("Opening already open doors");
+            throw new InvalidValueException("Opening already open doors");
         }
 
         ElevatorLogger.getInstance().logAction("Elevator " + getId() + " Doors Open");
@@ -272,9 +272,9 @@ public class Elevator {
         ElevatorDisplay.getInstance().openDoors(getId());
     }
 
-    private void closeDoors() throws InvalidStateException {
+    private void closeDoors() throws InvalidValueException {
         if (!getIsDoorOpen()) {
-            throw new InvalidStateException("Closing already closed doors");
+            throw new InvalidValueException("Closing already closed doors");
         }
 
         ElevatorLogger.getInstance().logAction("Elevator " + getId() + " Doors Close");
@@ -283,34 +283,39 @@ public class Elevator {
     }
 
     private String getRequestText() {
-        return getRiderRequestsText() + getCurrentFloorRequestsText();
+        return  getCurrentFloorRequestsText() + getRiderRequestsText();
     }
 
     private String getRiderRequestsText() {
-        String riders = riderRequests.stream()
-                .map(e -> Integer.toString(e.getFloorNumber()))
-                .collect(joining(","));
-
-        riders = riders.equals("") ? "none" : riders;
+        String riders = getCommaJoinedCollection(riderRequests);
         return "[Current Rider Requests: " + riders + "]";
     }
 
     private String getCurrentFloorRequestsText() {
-        String floors = floorRequests.stream()
-                .map(e -> Integer.toString(e.getFloorNumber()))
-                .collect(joining(","));
-
-        floors = floors.equals("") ? "none" : floors;
+        String floors = getCommaJoinedCollection(floorRequests);
         return "[Current Floor Requests: " + floors + "]";
     }
 
     private String getRidersText() {
-        String riders = peopleOnElevator.stream()
-                .map(Object::toString)
-                .collect(joining(","));
-
-        riders = riders.equals("") ? "none" : riders;
+        String riders = getCommaJoinedCollection(peopleOnElevator);
         return "[Riders: " + riders + "]";
+    }
+
+    private String getCommaJoinedCollection(ArrayList collection) {
+        if (collection.isEmpty()) {
+            return "none";
+        }
+
+        StringBuilder formattedItems = new StringBuilder();
+        for (int i = 0; i < collection.size(); i++) {
+            if (i > 0) {
+                formattedItems.append(", ");
+            }
+
+            formattedItems.append(collection.get(i));
+        }
+
+        return formattedItems.toString();
     }
 
     private ArrayList<ElevatorRequest> getFloorRequests() {
@@ -338,7 +343,7 @@ public class Elevator {
     }
 
     private void setCurrentFloor(int currentFloor) throws InvalidValueException {
-        Building.getInstance().validateFloor("Elevator " + getId() + " set to incorrect floor", currentFloor);
+        Building.getInstance().checkFloor("Elevator " + getId() + " set to incorrect floor", currentFloor);
         this.currentFloor = currentFloor;
     }
 
@@ -361,26 +366,28 @@ public class Elevator {
         this.capacity = capacity;
     }
 
-    private int getElevatorSpeedInMilliseconds() {
-        return elevatorSpeedInMilliseconds;
+    private int getElevatorSpeed() {
+        return elevatorSpeed;
     }
 
-    private void setElevatorSpeedInMilliseconds(int elevatorSpeedInMilliseconds) throws InvalidValueException {
-        if (elevatorSpeedInMilliseconds < 0) {
-            throw new InvalidValueException("Elevator speed must be greater than/equal to 0, got: " + elevatorSpeedInMilliseconds);
+    private void setElevatorSpeed(int elevatorSpeed) throws InvalidValueException {
+        if (elevatorSpeed < 0) {
+            throw new InvalidValueException("Elevator speed must be greater than/equal to 0, got: " + elevatorSpeed);
         }
-        this.elevatorSpeedInMilliseconds = elevatorSpeedInMilliseconds;
+
+        this.elevatorSpeed = elevatorSpeed;
     }
 
-    private int getDoorOpenTimeInMilliseconds() {
-        return doorOpenTimeInMilliseconds;
+    private int getDoorOpenTime() {
+        return doorOpenTime;
     }
 
-    private void setDoorOpenTimeInMilliseconds(int doorOpenTimeInMilliseconds) throws InvalidValueException {
-        if (doorOpenTimeInMilliseconds < 0) {
-            throw new InvalidValueException("Door open time must be greater than/equal to 0, got: " + doorOpenTimeInMilliseconds);
+    private void setDoorOpenTime(int doorOpenTime) throws InvalidValueException {
+        if (doorOpenTime < 0) {
+            throw new InvalidValueException("Door open time must be greater than/equal to 0, got: " + doorOpenTime);
         }
-        this.doorOpenTimeInMilliseconds = doorOpenTimeInMilliseconds;
+
+        this.doorOpenTime = doorOpenTime;
     }
 
     private int getReturnToDefaultFloorTimeout() {
@@ -395,28 +402,28 @@ public class Elevator {
         this.returnToDefaultFloorTimeout = returnToDefaultFloorTimeout;
     }
 
-    private int getTimeLeftOnFloor() {
-        return timeLeftOnFloor;
+    private int getTimeUntilNextFloor() {
+        return timeUntilNextFloor;
     }
 
-    private void setTimeLeftOnFloor(int timeLeftOnFloorIn) throws InvalidValueException {
+    private void setTimeUntilNextFloor(int timeLeftOnFloorIn) throws InvalidValueException {
         if (timeLeftOnFloorIn < 0) {
             throw new InvalidValueException("Time left on floor must be greater than/equal to 0, got: " + timeLeftOnFloorIn);
         }
 
-        this.timeLeftOnFloor = timeLeftOnFloorIn;
+        this.timeUntilNextFloor = timeLeftOnFloorIn;
     }
 
-    private int getIdleCount() {
-        return idleCount;
+    private int getIdleTimeout() {
+        return idleTimeout;
     }
 
-    private void setIdleCount(int idleCount) throws InvalidValueException {
-        if (idleCount < 0) {
-            throw new InvalidValueException("Idle count must be greater than/equal to 0, got: " + idleCount);
+    private void setIdleTimeout(int idleTimeout) throws InvalidValueException {
+        if (idleTimeout < 0) {
+            throw new InvalidValueException("Idle count must be greater than/equal to 0, got: " + idleTimeout);
         }
 
-        this.idleCount = idleCount;
+        this.idleTimeout = idleTimeout;
     }
 
     private int getTimeUntilDoorsClose() {
@@ -431,38 +438,21 @@ public class Elevator {
         this.timeUntilDoorsClose = timeTilClose;
     }
 
-    private static Direction getDirection(int endFloor, int startFloor) {
-        return endFloor > startFloor ? Direction.UP : Direction.DOWN;
-    }
-
     private ArrayList<Person> getPeopleOnElevator() {
         return this.peopleOnElevator;
-    }
-
-    public void resetState() throws InvalidValueException {
-        setIsDoorOpen(false);
-        setCurrentFloor(1);
-        setElevatorDirection(Direction.IDLE);
-        setTimeLeftOnFloor(0);
-        setTimeUntilDoorsClose(0);
-        setIdleCount(0);
-
-        floorRequests = new ArrayList<>();
-        riderRequests = new ArrayList<>();
-        peopleOnElevator = new ArrayList<>();
     }
 
     public String toString() {
         String output = "";
 
-        output += "Elevator " + getId() + " report ...\n";
-        output += "Current Direction: " + getElevatorDirection() + "\n";
-        output += "Current Floor: " + getCurrentFloor() + "\n";
-        output += "Current Floor Requests " + floorRequests + "\n";
-        output += "Current Rider Requests " + riderRequests + "\n";
-        output += "Current Passengers: " + peopleOnElevator.toString() + "\n";
-        output += "Doors Open: " + getIsDoorOpen() + "\n";
-        output += "---------------\n";
+        output += "   Elevator " + getId() + " report ...\n";
+        output += "   Current Direction: " + getElevatorDirection() + "\n";
+        output += "   Current Floor: " + getCurrentFloor() + "\n";
+        output += "   Current Floor Requests " + floorRequests + "\n";
+        output += "   Current Rider Requests " + riderRequests + "\n";
+        output += "   Current Passengers: " + peopleOnElevator.toString() + "\n";
+        output += "   Doors Open: " + getIsDoorOpen() + "\n";
+        output += "   ---------------\n";
 
         return output;
     }

@@ -1,7 +1,5 @@
 package models;
 
-import exceptions.InvalidStateException;
-import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
 
 import java.util.ArrayList;
@@ -34,33 +32,35 @@ public class ElevatorController {
             ElevatorDisplay.getInstance().addElevator(elevatorID, 1);
         }
     }
-    
-    
-    // TODO why throw an error?
-    // If so, whats the range of id?
-    public Elevator getElevator(int id) throws InvalidValueException {
-        return elevators.get(id - 1);
+
+    private Elevator getElevator(int id) throws InvalidValueException {
+        try {
+            return elevators.get(id - 1);
+        } catch (IndexOutOfBoundsException ex) {
+            throw new InvalidValueException("Could not find Elevator with given ID in elevator controller");
+        }
     }
 
-    public void moveElevators(int time) throws InvalidValueException, InvalidStateException {
+    public void moveElevators(int time) throws InvalidValueException {
         for (Elevator e : elevators) {
             e.doTimeSlice(time);
         }
     }
 
-    public void resetState() throws InvalidValueException {
-        for (Elevator e : elevators) {
-            e.resetState();
-        }
+    public void addElevatorRequest(ElevatorRequest elevatorRequest, Person person, int elevatorId) throws InvalidValueException {
+        ElevatorLogger.getInstance().logAction("Person " + person.getId() + " presses " + elevatorRequest.getDirection() + " button on Floor " + elevatorRequest.getFloorNumber());
+        getInstance().getElevator(elevatorId).addFloorRequest(elevatorRequest);
     }
 
     public String toString() {
         String output = "Elevator Controller report ...\n";
 
         output += "Elevators: \n";
+        StringBuilder outputBuilder = new StringBuilder(output);
         for (Elevator e : elevators) {
-            output += e.toString();
+            outputBuilder.append(e.toString());
         }
+        output = outputBuilder.toString();
         return output;
     }
 	

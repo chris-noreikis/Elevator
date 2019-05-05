@@ -1,29 +1,27 @@
 package main;
 
-import exceptions.InvalidStateException;
-import exceptions.InvalidValueException;
+import models.InvalidValueException;
 import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
-import models.*;
+import models.ElevatorController;
+import models.Person;
+import models.Building;
+import models.ElevatorRequest;
 
 public class ElevatorTestDriver {
     private int personCounter = 1;
 
-    void runTests() throws InterruptedException, InvalidStateException, InvalidValueException {
+    void runTests() throws InterruptedException, InvalidValueException {
         testOne();
         testTwo();
         testThree();
         testFour();
-        report();
+
+        printReport();
         ElevatorDisplay.getInstance().shutdown();
     }
 
-    void resetState() throws InvalidValueException {
-        Building.getInstance().resetState();
-        ElevatorController.getInstance().resetState();
-    }
-
-    void testOne() throws InterruptedException, InvalidStateException, InvalidValueException {
+    private void testOne() throws InterruptedException, InvalidValueException {
         for (int time = 0; time < 50; time++) {
 
             if (time == 0) {
@@ -34,7 +32,7 @@ public class ElevatorTestDriver {
         }
     }
 
-    void testTwo() throws InterruptedException, InvalidStateException, InvalidValueException {
+    private void testTwo() throws InterruptedException, InvalidValueException {
         for (int time = 0; time < 70; time++) {
 
             if (time == 0) {
@@ -49,7 +47,7 @@ public class ElevatorTestDriver {
         }
     }
 
-    void testThree() throws InterruptedException, InvalidStateException, InvalidValueException {
+    private void testThree() throws InterruptedException, InvalidValueException {
         for (int time = 0; time < 70; time++) {
 
             if (time == 0) {
@@ -64,7 +62,7 @@ public class ElevatorTestDriver {
         }
     }
 
-    void testFour() throws InterruptedException, InvalidStateException, InvalidValueException {
+    private void testFour() throws InterruptedException, InvalidValueException {
         for (int time = 0; time < 80; time++) {
 
             if (time == 0) {
@@ -87,52 +85,19 @@ public class ElevatorTestDriver {
         }
     }
 
-    void testFive() throws InterruptedException, InvalidStateException, InvalidValueException {
-        for (int time = 0; time < 40; time++) {
-            if (time == 0) {
-                addPerson(5, 1, 1);
-            }
-            moveElevators(1000);
-        }
-    }
-
-    void testSix() throws InterruptedException, InvalidStateException, InvalidValueException {
-        for (int time = 0; time < 80; time++) {
-            if (time == 0) {
-                addPerson(8, 4, 1);
-            }
-
-            if (time == 3) {
-                addPerson(4, 9, 1);
-            }
-
-            if (time == 20) {
-                addPerson(5, 15, 1);
-            }
-
-            moveElevators(1000);
-        }
-    }
-
-    private void moveElevators(int time) throws InterruptedException, InvalidStateException {
-        try {
-            ElevatorController.getInstance().moveElevators(time);
-        } catch (InvalidValueException ex) {
-            System.out.println("Bad input data");
-            ex.printStackTrace();
-        }
+    private void moveElevators(int time) throws InterruptedException, InvalidValueException {
+        ElevatorController.getInstance().moveElevators(time);
         Thread.sleep(time);
     }
 
-    private void addPerson(int start, int end, int elevId) throws InvalidValueException {
-        Direction d = end > start ? ElevatorDisplay.Direction.UP : ElevatorDisplay.Direction.DOWN;
+    private void addPerson(int start, int end, int elevatorId) throws InvalidValueException {
+        Direction d = end > start ? Direction.UP : Direction.DOWN;
         Person p = new Person(start, end, "P" + personCounter++);
-        Building.getInstance().addPerson(p, start);
-        ElevatorController.getInstance().getElevator(elevId).addFloorRequest(new ElevatorRequest(d, start));
-        ElevatorLogger.getInstance().logAction("Person " + p.getId() + " pressed " + d + " on Floor " + start);
+        Building.getInstance().addPerson(p);
+        ElevatorController.getInstance().addElevatorRequest(new ElevatorRequest(d, start), p, elevatorId);
     }
 
-    private void report() throws InvalidValueException {
+    private void printReport() throws InvalidValueException {
         System.out.println("");
         System.out.println(Building.getInstance());
         System.out.println("");

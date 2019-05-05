@@ -1,8 +1,8 @@
 {
   "floors": 20,
   "elevators": 4,
-  "elevatorPersonCapacity": 15,
-  "elevatorSpeedInMilliseconds": 1000,
-  "doorOpenTime": 3000,
-  "returnToDefaultFloorTimeout": 60000
+  "elevatorPersonCapacity": 4,
+  "elevatorSpeed": 1000,
+  "doorOpenTime": 2000,
+  "returnToDefaultFloorTimeout": 10000
 }

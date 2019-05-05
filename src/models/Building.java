@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import SimulationConfiguration.BuildingConfigurable;
 import SimulationConfiguration.ConfigurationException;
 import SimulationConfiguration.ElevatorConfigurationFactory;
-import exceptions.InvalidValueException;
 import gui.ElevatorDisplay;
 
 public class Building {
@@ -25,14 +24,14 @@ public class Building {
         return null;
     }
 
-    public static Building getInstance() throws InvalidValueException{
+    public static Building getInstance() throws InvalidValueException {
         if (instance == null) {
             instance = new Building();
         }
         return instance;
     }
 
-    private Building() throws InvalidValueException{
+    private Building() throws InvalidValueException {
         ElevatorDisplay.getInstance().initialize(getNumberOfFloors());
         setupFloors();
     }
@@ -46,9 +45,7 @@ public class Building {
     }
 
     public Floor getFloor(int floorNumber) throws InvalidValueException {
-    	if(floorNumber <= 0 || floorNumber > this.getNumberOfFloors()) {
-    		throw new InvalidValueException("Floor number is not a valid floor");
-    	}
+        checkFloor("getFloor called with invalid floor", floorNumber);
         return floors.get(floorNumber - 1);
     }
 
@@ -65,7 +62,7 @@ public class Building {
     }
 
     public int getElevatorSpeed() {
-        return buildingConfiguration.getElevatorSpeedInMilliseconds();
+        return buildingConfiguration.getElevatorSpeed();
     }
 
     public int getDoorOpenTime() {
@@ -76,38 +73,29 @@ public class Building {
         return buildingConfiguration.getReturnToDefaultFloorTimeout();
     }
 
-    public void addPerson(Person p, int floorNumber) throws InvalidValueException {
-        if (p.getStartFloor() < 1 || p.getEndFloor() > getNumberOfFloors()) {
-            throw new InvalidValueException("Person is trying to go to a floor that doesn\'t exist: " + p.getEndFloor());
-        }
-        if (p.getEndFloor() > Building.getInstance().getNumberOfFloors() || p.getEndFloor() < 1) {
-            throw new InvalidValueException("Person is trying to go to a floor that doesn\'t exist: " + p.getEndFloor());
-        }
-        getFloor(floorNumber).addWaitingPerson(p);
+    public void addPerson(Person person) throws InvalidValueException {
+        checkFloor("Person is starting on a floor that doesn\'t exist", person.getStartFloor());
+        checkFloor("Person is trying to get to a floor that doesn\'t exist", person.getEndFloor());
+
+        getFloor(person.getStartFloor()).addWaitingPerson(person);
     }
 
-    public void resetState() {
-        for (Floor f : floors) {
-            f.resetState();
-        }
-    }
-
-    public void validateFloor(String errorMessage, int floorNumber) throws InvalidValueException {
+    public void checkFloor(String errorMessage, int floorNumber) throws InvalidValueException {
         if (floorNumber < 1 || floorNumber > getNumberOfFloors()) {
             int maxFloor = getNumberOfFloors();
-            String errorMessageFormatted = String.format("%s; expected 1-%d, got %d", errorMessage, maxFloor, floorNumber);
-            throw new InvalidValueException(errorMessageFormatted);
+            String formattedErrorMessage = String.format("%s; expected 1-%d, got %d", errorMessage, maxFloor, floorNumber);
+            throw new InvalidValueException(formattedErrorMessage);
         }
     }
 
     public String toString() {
-        String output = "";
-        output += "Building Report ...\n";
+        StringBuilder output = new StringBuilder();
+        output.append("Building Report ...\n");
 
         for (Floor f : floors) {
-            output += f.toString();
+            output.append(f.toString());
         }
 
-        return output;
+        return output.toString();
     }
 }

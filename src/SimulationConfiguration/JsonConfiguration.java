@@ -8,7 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class JsonConfiguration implements BuildingConfigurable {
-    private int elevatorSpeedInMilliseconds;
+    private int elevatorSpeed;
     private int elevatorCapacity;
     private int returnToDefaultFloorTimeout;
     private int numberOfElevators;
@@ -19,7 +19,7 @@ public class JsonConfiguration implements BuildingConfigurable {
     public JsonConfiguration(String configurationFilePath) throws ConfigurationException {
         try {
             parseAndSetConfigurationJSON(configurationFilePath);
-            elevatorSpeedInMilliseconds = getConfigurationFieldFromJSON("elevatorSpeedInMilliseconds");
+            elevatorSpeed = getConfigurationFieldFromJSON("elevatorSpeed");
             elevatorCapacity = getConfigurationFieldFromJSON("elevatorPersonCapacity");
             returnToDefaultFloorTimeout = getConfigurationFieldFromJSON("returnToDefaultFloorTimeout");
             numberOfElevators = getConfigurationFieldFromJSON("elevators");
@@ -32,8 +32,8 @@ public class JsonConfiguration implements BuildingConfigurable {
         }
     }
 
-    public int getElevatorSpeedInMilliseconds() {
-        return elevatorSpeedInMilliseconds;
+    public int getElevatorSpeed() {
+        return elevatorSpeed;
     }
 
     public int getElevatorCapacity() {
@@ -69,12 +69,18 @@ public class JsonConfiguration implements BuildingConfigurable {
         configurationJSON = (JSONObject) obj;
     }
 
-    private int getConfigurationFieldFromJSON(String elevatorSpeedInMilliseconds) throws ConfigurationException{
-        long defaultValue = 0;
-        int configurationValue = (int) (long) configurationJSON.getOrDefault(elevatorSpeedInMilliseconds, defaultValue);
-        if (configurationValue <= 0) {
-            throwInvalidValueException(elevatorSpeedInMilliseconds, configurationValue);
+    private int getConfigurationFieldFromJSON(String configurationFieldName) throws ConfigurationException {
+        int configurationValue;
+        try {
+            configurationValue = (int) (long) configurationJSON.get(configurationFieldName);
+        } catch (Exception e) {
+            throw new ConfigurationException("Could not parse configuration field: " + configurationFieldName);
         }
+
+        if (configurationValue <= 0) {
+            throwInvalidValueException(configurationFieldName, configurationValue);
+        }
+
         return configurationValue;
     }
 }
