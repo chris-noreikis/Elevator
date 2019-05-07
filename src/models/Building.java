@@ -90,7 +90,7 @@ public class Building {
 
     public String toString() {
         StringBuilder output = new StringBuilder();
-        output.append("Building Report ...\n");
+        output.append("Building Report \n");
 
         for (Floor f : floors) {
             output.append(f.toString());

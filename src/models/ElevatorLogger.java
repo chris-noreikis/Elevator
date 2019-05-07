@@ -4,8 +4,7 @@ public class ElevatorLogger {
     private static ElevatorLogger instance;
     private long creationTimestamp;
 
-    public static ElevatorLogger getInstance()
-    {
+    public static ElevatorLogger getInstance() {
         if (instance == null) {
             instance = new ElevatorLogger();
         }

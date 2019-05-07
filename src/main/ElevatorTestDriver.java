@@ -11,7 +11,7 @@ import models.ElevatorRequest;
 public class ElevatorTestDriver {
     private int personCounter = 1;
 
-    void runTests() throws InterruptedException, InvalidValueException {
+    public void runTests() throws InterruptedException, InvalidValueException {
         testOne();
         testTwo();
         testThree();
@@ -54,7 +54,7 @@ public class ElevatorTestDriver {
                 addPerson(20, 1, 3);
             }
 
-            if (time == 24) {
+            if (time == 25) {
                 addPerson(10, 1, 3);
             }
 

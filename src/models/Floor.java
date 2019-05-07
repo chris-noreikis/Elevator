@@ -55,7 +55,7 @@ public class Floor {
 
     public String toString() {
         String output = "";
-        output += "   Floor " + floorNumber + " Report ...\n";
+        output += "   Floor " + floorNumber + " Report \n";
         output += "   waitingPersons: " + waitingPersons.toString() + "\n";
         output += "   donePersons: " + donePersons.toString() + "\n";
         output += "---------------\n";
