@@ -76,7 +76,7 @@ public class Elevator {
             return;
         }
 
-        if (isRequestPoolEmpty() && getElevatorDirection() == Direction.IDLE && getCurrentFloor() != 1) {
+        if (isRequestPoolEmpty() && !isInDefaultState()) {
             int idleCount = getIdleTimeout();
             idleCount += time;
             setIdleTimeout(idleCount);
@@ -101,22 +101,26 @@ public class Elevator {
         }
 
         ArrayList<ElevatorRequest> elevatorRequests = getSortedRequests();
-        if (elevatorRequests.size() == 0) {
-            throw new InvalidValueException("Elevator is not processing any requests");
-        }
+        if (elevatorRequests.size() > 0) {
+            ElevatorRequest nextRequest = elevatorRequests.get(0);
+            if (riderRequests.contains(nextRequest)) {
+                if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection) {
+                    return true;
+                }
+            }
 
-        ElevatorRequest nextRequest = elevatorRequests.get(0);
-        if (riderRequests.contains(nextRequest)) {
-            if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection) return true;
-        }
-
-        if (floorRequests.contains(nextRequest)) {
-            if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection && requestDirection == nextRequest.getDirection()) {
-                return true;
+            if (floorRequests.contains(nextRequest)) {
+                if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection && requestDirection == nextRequest.getDirection()) {
+                    return true;
+                }
             }
         }
 
         return false;
+    }
+
+    public boolean isInDefaultState() {
+        return getElevatorDirection() == Direction.IDLE && getCurrentFloor() == 1;
     }
 
     private void processPendingRequests() throws InvalidValueException {
@@ -267,6 +271,7 @@ public class Elevator {
                 movedPeople.add(p);
                 peopleOnElevator.add(p);
                 ElevatorLogger.getInstance().logAction("Person " + p.getId() + " entered Elevator " + getId() + " " + getRidersText());
+                p.startElevatorRide();
                 Direction dir = ElevatorDirection.determineDirection(p.getStartFloor(), p.getEndFloor());
                 ElevatorRequest newRequest = new ElevatorRequest(dir, p.getEndFloor());
                 if (!riderRequests.contains(newRequest)) {
@@ -303,6 +308,7 @@ public class Elevator {
         for (Person p : filteredPeople) {
             if (p.isAtDestinationFloor(currentFloor)) {
                 peopleOnElevator.remove(p);
+                p.endElevatorRide();
                 ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getId() + " " + getRidersText());
                 Building.getInstance().getFloor(currentFloor).addDonePerson(p);
             }

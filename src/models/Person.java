@@ -6,6 +6,10 @@ public class Person {
     private int startFloor;
     private int endFloor;
     private String id;
+    private long waitStart;
+    private long waitEnd;
+    private long rideStart;
+    private long rideEnd;
 
     public Person(int startFloor, int endFloor, String id) throws InvalidValueException {
         setStartFloor(startFloor);
@@ -53,5 +57,40 @@ public class Person {
     private void setEndFloor(int endFloor) throws InvalidValueException {
         Building.getInstance().checkFloor("Person set to invalid end floor", endFloor);
         this.endFloor = endFloor;
+    }
+
+    public long getWaitStart() {
+        return waitStart;
+    }
+
+    public void startWaiting() {
+        this.waitStart = System.currentTimeMillis();
+    }
+
+    public long getWaitEnd() {
+        return waitEnd;
+    }
+
+    public void startElevatorRide() {
+        long currentTime = System.currentTimeMillis();
+        this.waitEnd = currentTime;
+        this.rideStart = currentTime;
+    }
+
+    public void endElevatorRide() {
+        this.rideEnd = System.currentTimeMillis();
+    }
+
+
+    public long getRideStart() {
+        return rideStart;
+    }
+
+    public long getRideEnd() {
+        return rideEnd;
+    }
+
+    public void endRiding(long rideEnd) {
+        this.rideEnd = System.currentTimeMillis();
     }
 }

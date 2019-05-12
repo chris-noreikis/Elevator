@@ -2,9 +2,9 @@ package models;
 
 import java.util.ArrayList;
 
-import SimulationConfiguration.BuildingConfigurable;
-import SimulationConfiguration.ConfigurationException;
-import SimulationConfiguration.ElevatorConfigurationFactory;
+import configuration.BuildingConfigurable;
+import configuration.ConfigurationException;
+import configuration.ElevatorConfigurationFactory;
 import gui.ElevatorDisplay;
 
 public class Building {
@@ -78,6 +78,7 @@ public class Building {
         checkFloor("Person is trying to get to a floor that doesn\'t exist", person.getEndFloor());
 
         getFloor(person.getStartFloor()).addWaitingPerson(person);
+        person.startWaiting();
     }
 
     public void checkFloor(String errorMessage, int floorNumber) throws InvalidValueException {

@@ -1,4 +1,4 @@
-package SimulationConfiguration;
+package configuration;
 
 public class ElevatorConfigurationFactory {
     public static BuildingConfigurable build(String type, String filepath) throws ConfigurationException {

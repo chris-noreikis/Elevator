@@ -1,4 +1,4 @@
-package SimulationConfiguration;
+package configuration;
 
 public interface BuildingConfigurable {
     public int getElevatorSpeed();

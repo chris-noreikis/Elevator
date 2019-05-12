@@ -76,4 +76,14 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
         output = outputBuilder.toString();
         return output;
     }
+
+    public boolean isOperating() {
+        for (Elevator e : elevators) {
+            if (!e.isInDefaultState()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
