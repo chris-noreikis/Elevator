@@ -12,10 +12,11 @@ public class ElevatorTestDriver {
     private int personCounter = 1;
 
     public void runTests() throws InterruptedException, InvalidValueException {
-        testOne();
-        testTwo();
-        testThree();
-        testFour();
+//        testOne();
+//        testTwo();
+//        testThree();
+//        testFour();
+        partTwo();
 
         printReport();
         ElevatorDisplay.getInstance().shutdown();
@@ -85,6 +86,30 @@ public class ElevatorTestDriver {
         }
     }
 
+    private void partTwo() throws InterruptedException, InvalidValueException {
+        for (int time = 0; time < 80; time++) {
+
+            if (time == 0) {
+                addPerson(1, 14, 1);
+            }
+
+            if (time == 4) {
+                addPerson(3, 1, 1);
+            }
+
+            if (time == 5) {
+                addPerson(7, 4, 1);
+            }
+
+            if (time == 6) {
+                addPerson(5, 2, 1);
+            }
+
+
+            moveElevators(1000);
+        }
+    }
+
     private void moveElevators(int time) throws InterruptedException, InvalidValueException {
         ElevatorController.getInstance().moveElevators(time);
         Thread.sleep(time);
@@ -94,7 +119,7 @@ public class ElevatorTestDriver {
         Direction d = end > start ? Direction.UP : Direction.DOWN;
         Person p = new Person(start, end, "P" + personCounter++);
         Building.getInstance().addPerson(p);
-        ElevatorController.getInstance().addElevatorRequest(new ElevatorRequest(d, start), p, elevatorId);
+        ElevatorController.getInstance().addElevatorRequest(new ElevatorRequest(d, start), p);
     }
 
     private void printReport() throws InvalidValueException {

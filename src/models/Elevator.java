@@ -2,6 +2,7 @@ package models;
 
 import gui.ElevatorDisplay;
 import gui.ElevatorDisplay.Direction;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,9 +88,55 @@ public class Elevator {
 
         setToIdleIfNoMoreRequests();
 
-        if (!isRequestPoolEmpty()) {
+        if (isRequestPoolEmpty()) {
+            processPendingRequests();
+        } else {
             respondToRequests();
         }
+    }
+
+    public boolean isInDesiredDirection(int requestFloor, Direction requestDirection) throws InvalidValueException {
+        if (getElevatorDirection() == Direction.IDLE) {
+            throw new InvalidValueException("isInDesiredDirection called with an idle elevator");
+        }
+
+        ArrayList<ElevatorRequest> elevatorRequests = getSortedRequests();
+        if (elevatorRequests.size() == 0) {
+            throw new InvalidValueException("Elevator is not processing any requests");
+        }
+
+        ElevatorRequest nextRequest = elevatorRequests.get(0);
+        if (riderRequests.contains(nextRequest)) {
+            if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection) return true;
+        }
+
+        if (floorRequests.contains(nextRequest)) {
+            if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection && requestDirection == nextRequest.getDirection()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void processPendingRequests() throws InvalidValueException {
+        ArrayList<ElevatorRequest> requests = ElevatorController.getInstance().processPendingRequests();
+        for (ElevatorRequest e : requests) {
+            System.out.println("Adding elevator request from pending requests:" + e);
+            addFloorRequest(e);
+        }
+    }
+
+    private boolean isMovingTowardsFloor(int requestFloor) {
+        if (getElevatorDirection() == Direction.UP && requestFloor >= getCurrentFloor()) {
+            return true;
+        }
+
+        if (getElevatorDirection() == Direction.DOWN && requestFloor <= getCurrentFloor()) {
+            return true;
+        }
+
+        return false;
     }
 
     private void decrementWaitTimes(int time) throws InvalidValueException {
@@ -326,7 +373,7 @@ public class Elevator {
         this.id = id;
     }
 
-    private int getId() {
+    public int getId() {
         return id;
     }
 
@@ -338,7 +385,7 @@ public class Elevator {
         this.isDoorOpen = nextValue;
     }
 
-    private int getCurrentFloor() {
+    public int getCurrentFloor() {
         return currentFloor;
     }
 
@@ -347,7 +394,7 @@ public class Elevator {
         this.currentFloor = currentFloor;
     }
 
-    private Direction getElevatorDirection() {
+    public Direction getElevatorDirection() {
         return elevatorDirection;
     }
 

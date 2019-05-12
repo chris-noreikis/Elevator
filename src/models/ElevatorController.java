@@ -1,12 +1,15 @@
 package models;
 
+import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
 
 import java.util.ArrayList;
 
-public class ElevatorController {
+public class ElevatorController implements PendingRequestProcessor, FloorRequestAssigner {
     private ArrayList<Elevator> elevators;
     private static ElevatorController instance;
+    private PendingRequestProcessor pendingRequestProcessor;
+    private FloorRequestAssigner floorRequestAssigner;
 
     public static ElevatorController getInstance() throws InvalidValueException {
         if (instance == null) {
@@ -18,6 +21,8 @@ public class ElevatorController {
 
     private ElevatorController() throws InvalidValueException {
         setupElevators();
+        pendingRequestProcessor = PendingRequestProcessorFactory.build();
+        floorRequestAssigner = FloorRequestAssignerFactory.build();
     }
 
     private void setupElevators() throws InvalidValueException {
@@ -33,7 +38,7 @@ public class ElevatorController {
         }
     }
 
-    private Elevator getElevator(int id) throws InvalidValueException {
+    public Elevator getElevator(int id) throws InvalidValueException {
         try {
             return elevators.get(id - 1);
         } catch (IndexOutOfBoundsException ex) {
@@ -47,9 +52,17 @@ public class ElevatorController {
         }
     }
 
-    public void addElevatorRequest(ElevatorRequest elevatorRequest, Person person, int elevatorId) throws InvalidValueException {
-        ElevatorLogger.getInstance().logAction("Person " + person.getId() + " presses " + elevatorRequest.getDirection() + " button on Floor " + elevatorRequest.getFloorNumber());
-        getInstance().getElevator(elevatorId).addFloorRequest(elevatorRequest);
+    public void addElevatorRequest(ElevatorRequest elevatorRequest, Person person) throws InvalidValueException {
+        floorRequestAssigner.addElevatorRequest(elevatorRequest, person);
+    }
+
+    public ArrayList<ElevatorRequest> processPendingRequests() throws InvalidValueException {
+        return pendingRequestProcessor.processPendingRequests();
+    }
+
+    @Override
+    public void addPendingRequest(ElevatorRequest e) throws InvalidValueException {
+        pendingRequestProcessor.addPendingRequest(e);
     }
 
     public String toString() {
@@ -63,5 +76,4 @@ public class ElevatorController {
         output = outputBuilder.toString();
         return output;
     }
-	
 }

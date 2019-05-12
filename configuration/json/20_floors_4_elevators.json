@@ -1,6 +1,6 @@
 {
   "floors": 20,
-  "elevators": 4,
+  "elevators": 1,
   "elevatorPersonCapacity": 4,
   "elevatorSpeed": 1000,
   "doorOpenTime": 2000,
