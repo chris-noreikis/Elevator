@@ -93,4 +93,8 @@ public class Person {
     public void endRiding(long rideEnd) {
         this.rideEnd = System.currentTimeMillis();
     }
+
+    public double getWaitTime() { return (waitEnd - waitStart) / 1000.0; }
+
+    public double getRideTime() { return (rideEnd - rideStart) / 1000.0; }
 }

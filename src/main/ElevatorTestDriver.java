@@ -20,6 +20,7 @@ public class ElevatorTestDriver {
 //        testFour();
         partTwo();
 
+        printMaxMinWaitTimes();
         printTable();
 //        printReport();
         ElevatorDisplay.getInstance().shutdown();
@@ -90,31 +91,31 @@ public class ElevatorTestDriver {
     }
 
     private void partTwo() throws InterruptedException, InvalidValueException {
-        for (int time = 0; time < 7; time++) {
-
-//            if (time % 3 == 0) {
-//                int startFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
-//                int endFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
-//                while (endFloor == startFloor) {
-//                    endFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
-//                }
-//                addPerson(startFloor, endFloor);
-//            }
+        for (int time = 0; time < 30; time++) {
 
             if (time % 3 == 0) {
-                int startFloor = (int) (randomObject.nextDouble() * 5 + 1);
-                int endFloor = (int) (randomObject.nextDouble() * 5 + 1);
+                int startFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
+                int endFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
                 while (endFloor == startFloor) {
-                    endFloor = (int) (randomObject.nextDouble() * 5 + 1);
+                    endFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
                 }
                 addPerson(startFloor, endFloor);
             }
+
+//            if (time % 3 == 0) {
+//                int startFloor = (int) (randomObject.nextDouble() * 5 + 1);
+//                int endFloor = (int) (randomObject.nextDouble() * 5 + 1);
+//                while (endFloor == startFloor) {
+//                    endFloor = (int) (randomObject.nextDouble() * 5 + 1);
+//                }
+//                addPerson(startFloor, endFloor);
+//            }
 
             moveElevators(1000);
         }
 
         while (ElevatorController.getInstance().isOperating()) {
-            System.out.println("** Still Operating Elevators");
+            System.out.println("** Still Operating Elevators **");
             moveElevators(1000);
         }
     }
@@ -132,24 +133,67 @@ public class ElevatorTestDriver {
         ElevatorController.getInstance().addElevatorRequest(new ElevatorRequest(d, start), p);
     }
 
+    private void printMaxMinWaitTimes() {
+        double averageWaitTime = getAverageWaitTime();
+        double averageRideTime = getAverageRideTime();
+        double minWaitTime = getMinWaitTime();
+        double minRideTime = getMinRideTime();
+        double maxWaitTime = getMaxWaitTime();
+        double maxRideTime = getMaxRideTime();
+
+        System.out.println(String.format("Avg Wait Time: %15.1f", averageWaitTime));
+        System.out.println(String.format("Avg Ride Time: %15.1f", averageRideTime));
+        System.out.println();
+
+        System.out.println(String.format("Min Wait Time: %15.1f", minWaitTime));
+        System.out.println(String.format("Min Ride Time: %15.1f", minRideTime));
+        System.out.println();
+
+        System.out.println(String.format("Max Wait Time: %15.1f", maxWaitTime));
+        System.out.println(String.format("Max Ride Time: %15.1f", maxRideTime));
+        System.out.println();
+
+    }
+
+    private double getAverageWaitTime() {
+        return people.stream().mapToDouble(Person::getWaitTime).average().orElse(0.0);
+    }
+
+    private double getAverageRideTime() {
+        return people.stream().mapToDouble(Person::getRideTime).average().orElse(0.0);
+    }
+
+    private double getMinWaitTime() {
+        return people.stream().mapToDouble(Person::getWaitTime).min().orElse(0);
+    }
+
+    private double getMaxWaitTime() {
+        return people.stream().mapToDouble(Person::getWaitTime).max().orElse(0);
+    }
+
+    private double getMinRideTime() {
+        return people.stream().mapToDouble(Person::getRideTime).min().orElse(0);
+    }
+
+    private double getMaxRideTime() {
+        return people.stream().mapToDouble(Person::getRideTime).max().orElse(0);
+    }
+
     private void printTable() throws InvalidValueException {
-        String string = String.format(	"%10s %15s %15s %15s %15s %15s %15s",
+        String string = String.format("%10s %15s %15s %15s %15s %15s %15s",
                 "Person", "Start Floor", "End Floor", "Direction", "Wait Time", "Ride Time", "Total Time");
         System.out.println(string);
 
-        string = String.format(	"%10s %15s %15s %15s %15s %15s %15s",
+        string = String.format("%10s %15s %15s %15s %15s %15s %15s",
                 "------", "-----------", "---------", "---------", "---------", "---------", "----------");
         System.out.println(string);
 
-        for ( Person person : people)
-        {
+        for (Person person : people) {
             Direction d = ElevatorDirection.determineDirection(person.getStartFloor(), person.getEndFloor());
-            double waitTime = (person.getWaitEnd() - person.getWaitStart()) / 1000.0;
-            double rideTime = (person.getRideEnd() - person.getRideStart()) / 1000.0;
-            double totalTime = waitTime + rideTime;
-            string = String.format(	"%10s %15d %15d %15s %15.1f %15.1f %15.1f\n",
-                    person.getId(), person.getStartFloor(), person.getEndFloor(), d, waitTime, rideTime, totalTime);
-            System.out.print( string );
+            double totalTime = person.getWaitTime() + person.getRideTime();
+            string = String.format("%10s %15d %15d %15s %15.1f %15.1f %15.1f\n",
+                    person.getId(), person.getStartFloor(), person.getEndFloor(), d, person.getWaitTime(), person.getRideTime(), totalTime);
+            System.out.print(string);
         }
     }
 
