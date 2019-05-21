@@ -11,7 +11,6 @@ public class ElevatorLogger {
         return instance;
     }
 
-
     private ElevatorLogger() {
         creationTimestamp = System.currentTimeMillis();
     }

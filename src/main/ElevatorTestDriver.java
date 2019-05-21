@@ -3,9 +3,9 @@ package main;
 import models.*;
 import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
 
 public class ElevatorTestDriver {
@@ -56,11 +56,15 @@ public class ElevatorTestDriver {
         for (int time = 0; time < 70; time++) {
 
             if (time == 0) {
-                addPerson(20, 1);
+                addPerson(4, 15);
             }
 
-            if (time == 25) {
-                addPerson(10, 1);
+            if (time == 1) {
+                addPerson(3, 16);
+            }
+
+            if (time == 12) {
+                addPerson(12, 16);
             }
 
             moveElevators(1000);
@@ -91,7 +95,7 @@ public class ElevatorTestDriver {
     }
 
     private void partTwo() throws InterruptedException, InvalidValueException {
-        for (int time = 0; time < 30; time++) {
+        for (int time = 0; time < 5; time++) {
 
             if (time % 3 == 0) {
                 int startFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
@@ -136,21 +140,21 @@ public class ElevatorTestDriver {
     private void printMaxMinWaitTimes() {
         double averageWaitTime = getAverageWaitTime();
         double averageRideTime = getAverageRideTime();
-        double minWaitTime = getMinWaitTime();
-        double minRideTime = getMinRideTime();
-        double maxWaitTime = getMaxWaitTime();
-        double maxRideTime = getMaxRideTime();
+        Person minWaitPerson = getMinWaitPerson();
+        Person minRidePerson = getMinRideTime();
+        Person maxWaitPerson = getMaxWaitTime();
+        Person maxRidePerson = getMaxRideTime();
 
         System.out.println(String.format("Avg Wait Time: %15.1f", averageWaitTime));
         System.out.println(String.format("Avg Ride Time: %15.1f", averageRideTime));
         System.out.println();
 
-        System.out.println(String.format("Min Wait Time: %15.1f", minWaitTime));
-        System.out.println(String.format("Min Ride Time: %15.1f", minRideTime));
+        System.out.println(String.format("Min Wait Time: %15.1f (%s)", minWaitPerson.getWaitTime(), minWaitPerson.getId()));
+        System.out.println(String.format("Min Ride Time: %15.1f (%s)", minRidePerson.getRideTime(), minRidePerson.getId()));
         System.out.println();
 
-        System.out.println(String.format("Max Wait Time: %15.1f", maxWaitTime));
-        System.out.println(String.format("Max Ride Time: %15.1f", maxRideTime));
+        System.out.println(String.format("Max Wait Time: %15.1f (%s)", maxWaitPerson.getWaitTime(), maxWaitPerson.getId()));
+        System.out.println(String.format("Max Ride Time: %15.1f (%s)", maxRidePerson.getRideTime(), maxRidePerson.getId()));
         System.out.println();
 
     }
@@ -163,20 +167,20 @@ public class ElevatorTestDriver {
         return people.stream().mapToDouble(Person::getRideTime).average().orElse(0.0);
     }
 
-    private double getMinWaitTime() {
-        return people.stream().mapToDouble(Person::getWaitTime).min().orElse(0);
+    private Person getMinWaitPerson() {
+        return people.stream().min(Comparator.comparing(Person::getWaitTime)).orElse(null);
     }
 
-    private double getMaxWaitTime() {
-        return people.stream().mapToDouble(Person::getWaitTime).max().orElse(0);
+    private Person getMaxWaitTime() {
+        return people.stream().max(Comparator.comparing(Person::getWaitTime)).orElse(null);
     }
 
-    private double getMinRideTime() {
-        return people.stream().mapToDouble(Person::getRideTime).min().orElse(0);
+    private Person getMinRideTime() {
+        return people.stream().min(Comparator.comparing(Person::getRideTime)).orElse(null);
     }
 
-    private double getMaxRideTime() {
-        return people.stream().mapToDouble(Person::getRideTime).max().orElse(0);
+    private Person getMaxRideTime() {
+        return people.stream().max(Comparator.comparing(Person::getRideTime)).orElse(null);
     }
 
     private void printTable() throws InvalidValueException {

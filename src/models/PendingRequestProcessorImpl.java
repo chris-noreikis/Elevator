@@ -1,6 +1,7 @@
 package models;
 
 import gui.ElevatorDisplay;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 
@@ -34,6 +35,9 @@ public class PendingRequestProcessorImpl implements PendingRequestProcessor {
     }
 
     public void addPendingRequest(ElevatorRequest e) throws InvalidValueException {
+        if (e == null) {
+            throw new InvalidValueException("Elevator request cannot be null");
+        }
         pendingRequests.add(e);
     }
 }

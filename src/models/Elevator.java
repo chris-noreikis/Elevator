@@ -76,7 +76,7 @@ public class Elevator {
             return;
         }
 
-        if (isRequestPoolEmpty() && !isInDefaultState()) {
+        if (isRequestPoolEmpty() && isIdleOnDefaultFloor()) {
             int idleCount = getIdleTimeout();
             idleCount += time;
             setIdleTimeout(idleCount);
@@ -96,8 +96,10 @@ public class Elevator {
     }
 
     public boolean isInDesiredDirection(int requestFloor, Direction requestDirection) throws InvalidValueException {
-        if (getElevatorDirection() == Direction.IDLE) {
-            throw new InvalidValueException("isInDesiredDirection called with an idle elevator");
+        Building.getInstance().checkFloor("Invalid request floor", requestFloor);
+
+        if (requestDirection == null) {
+            throw new InvalidValueException("Request direction cannot be null");
         }
 
         ArrayList<ElevatorRequest> elevatorRequests = getSortedRequests();
@@ -105,12 +107,14 @@ public class Elevator {
             ElevatorRequest nextRequest = elevatorRequests.get(0);
             if (riderRequests.contains(nextRequest)) {
                 if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection) {
+                    System.out.println("** RIDER REQUEST IN SAME DIR **" + requestFloor);
                     return true;
                 }
             }
 
             if (floorRequests.contains(nextRequest)) {
                 if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection && requestDirection == nextRequest.getDirection()) {
+                    System.out.println("** FLOOR REQUEST IN SAME DIR **" + requestFloor);
                     return true;
                 }
             }
@@ -119,7 +123,7 @@ public class Elevator {
         return false;
     }
 
-    public boolean isInDefaultState() {
+    public boolean isIdleOnDefaultFloor() {
         return getElevatorDirection() == Direction.IDLE && getCurrentFloor() == 1;
     }
 

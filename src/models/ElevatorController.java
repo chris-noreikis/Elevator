@@ -1,6 +1,5 @@
 package models;
 
-import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
 
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
         if (instance == null) {
             instance = new ElevatorController();
         }
+
         return instance;
     }
 
@@ -47,12 +47,26 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
     }
 
     public void moveElevators(int time) throws InvalidValueException {
+        if (time < 0) {
+            throw new Error("Time must be greater than 0");
+        }
+
         for (Elevator e : elevators) {
             e.doTimeSlice(time);
         }
     }
 
     public void addElevatorRequest(ElevatorRequest elevatorRequest, Person person) throws InvalidValueException {
+        if (elevatorRequest == null) {
+            throw new InvalidValueException("Elevator Request cannot be null");
+        }
+
+        if (person == null) {
+            throw new InvalidValueException("Person cannot be null");
+        }
+
+        Building.getInstance().checkFloor("ElevatorController passed an invalid Elevator Request", elevatorRequest.getFloorNumber());
+
         floorRequestAssigner.addElevatorRequest(elevatorRequest, person);
     }
 
@@ -62,6 +76,10 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
 
     @Override
     public void addPendingRequest(ElevatorRequest e) throws InvalidValueException {
+        if (e == null) {
+            throw new InvalidValueException("Elevator request cannot be null");
+        }
+
         pendingRequestProcessor.addPendingRequest(e);
     }
 
@@ -79,11 +97,11 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
 
     public boolean isOperating() {
         for (Elevator e : elevators) {
-            if (!e.isInDefaultState()) {
-                return true;
+            if (e.isIdleOnDefaultFloor()) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 }
