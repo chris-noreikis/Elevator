@@ -1,6 +1,6 @@
 package configuration;
 
-public interface BuildingConfigurable {
+public interface SimulationDefinable {
     public int getElevatorSpeed();
 
     public int getElevatorCapacity();
@@ -12,4 +12,8 @@ public interface BuildingConfigurable {
     public int getNumberOfElevators();
 
     public int getNumberOfFloors();
+
+    public int getPersonCreationRate();
+
+    public int getSimulationDuration();
 }

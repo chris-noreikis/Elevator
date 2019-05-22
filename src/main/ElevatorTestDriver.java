@@ -1,5 +1,6 @@
 package main;
 
+import configuration.SimulationConfiguration;
 import models.*;
 import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
@@ -95,9 +96,11 @@ public class ElevatorTestDriver {
     }
 
     private void partTwo() throws InterruptedException, InvalidValueException {
-        for (int time = 0; time < 5; time++) {
+        int simulationDuration = SimulationConfiguration.getInstance().getSimulationDuration();
+        int personCreationRate = SimulationConfiguration.getInstance().getPersonCreationRate();
+        for (int time = 0; time < simulationDuration; time++) {
 
-            if (time % 3 == 0) {
+            if (time % personCreationRate == 0) {
                 int startFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
                 int endFloor = (int) (randomObject.nextDouble() * Building.getInstance().getNumberOfFloors() + 1);
                 while (endFloor == startFloor) {
@@ -105,15 +108,6 @@ public class ElevatorTestDriver {
                 }
                 addPerson(startFloor, endFloor);
             }
-
-//            if (time % 3 == 0) {
-//                int startFloor = (int) (randomObject.nextDouble() * 5 + 1);
-//                int endFloor = (int) (randomObject.nextDouble() * 5 + 1);
-//                while (endFloor == startFloor) {
-//                    endFloor = (int) (randomObject.nextDouble() * 5 + 1);
-//                }
-//                addPerson(startFloor, endFloor);
-//            }
 
             moveElevators(1000);
         }

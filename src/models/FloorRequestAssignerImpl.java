@@ -1,5 +1,6 @@
 package models;
 
+import configuration.SimulationConfiguration;
 import gui.ElevatorDisplay.Direction;
 
 public class FloorRequestAssignerImpl implements FloorRequestAssigner {
@@ -9,7 +10,7 @@ public class FloorRequestAssignerImpl implements FloorRequestAssigner {
         int requestFloor = elevatorRequest.getFloorNumber();
         Direction requestDirection = elevatorRequest.getDirection();
 
-        int numElevators = Building.getInstance().getNumberOfElevators();
+        int numElevators = SimulationConfiguration.getInstance().getNumberOfElevators();
 
         for (int i = 1; i <= numElevators; i++) {
             Elevator e = ElevatorController.getInstance().getElevator(i);

@@ -7,13 +7,15 @@ import org.json.simple.parser.ParseException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class JsonConfiguration implements BuildingConfigurable {
+public class JsonConfiguration implements SimulationDefinable {
     private int elevatorSpeed;
     private int elevatorCapacity;
     private int returnToDefaultFloorTimeout;
     private int numberOfElevators;
     private int doorOpenTime;
     private int numberOfFloors;
+    private int simulationDuration;
+    private int personCreationRate;
     private JSONObject configurationJSON;
 
     public JsonConfiguration(String configurationFilePath) throws ConfigurationException {
@@ -25,6 +27,8 @@ public class JsonConfiguration implements BuildingConfigurable {
             numberOfElevators = getConfigurationFieldFromJSON("elevators");
             doorOpenTime = getConfigurationFieldFromJSON("doorOpenTime");
             numberOfFloors = getConfigurationFieldFromJSON("floors");
+            simulationDuration = getConfigurationFieldFromJSON("simulationDuration");
+            personCreationRate = getConfigurationFieldFromJSON("personCreationRate");
         } catch (IOException e) {
             throwFileNotFoundException(configurationFilePath);
         } catch (ParseException e) {
@@ -51,6 +55,10 @@ public class JsonConfiguration implements BuildingConfigurable {
     public int getNumberOfElevators() { return numberOfElevators; }
 
     public int getNumberOfFloors() { return numberOfFloors; }
+
+    public int getSimulationDuration() { return simulationDuration; }
+
+    public int getPersonCreationRate() { return personCreationRate; }
 
     private void throwFileNotFoundException(String configurationFilePath) throws ConfigurationException {
         throw new ConfigurationException("Elevator configuration could not found found: " + configurationFilePath);

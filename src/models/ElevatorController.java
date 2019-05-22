@@ -1,5 +1,6 @@
 package models;
 
+import configuration.SimulationConfiguration;
 import gui.ElevatorDisplay;
 
 import java.util.ArrayList;
@@ -26,11 +27,11 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
     }
 
     private void setupElevators() throws InvalidValueException {
-        int numElevators = Building.getInstance().getNumberOfElevators();
-        int elevatorCapacity = Building.getInstance().getElevatorCapacity();
-        int elevatorSpeed = Building.getInstance().getElevatorSpeed();
-        int doorOpenTime = Building.getInstance().getDoorOpenTime();
-        int returnToFirstFloorAfter = Building.getInstance().getReturnToDefaultFloorTimeout();
+        int numElevators = SimulationConfiguration.getInstance().getNumberOfElevators();
+        int elevatorCapacity = SimulationConfiguration.getInstance().getElevatorCapacity();
+        int elevatorSpeed = SimulationConfiguration.getInstance().getElevatorSpeed();
+        int doorOpenTime = SimulationConfiguration.getInstance().getDoorOpenTime();
+        int returnToFirstFloorAfter = SimulationConfiguration.getInstance().getReturnToDefaultFloorTimeout();
         elevators = new ArrayList<>();
         for (int elevatorID = 1; elevatorID <= numElevators; elevatorID++) {
             elevators.add(new Elevator(elevatorID, elevatorCapacity, elevatorSpeed, doorOpenTime, returnToFirstFloorAfter));
@@ -97,11 +98,11 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
 
     public boolean isOperating() {
         for (Elevator e : elevators) {
-            if (e.isIdleOnDefaultFloor()) {
-                return false;
+            if (!e.isIdleOnDefaultFloor()) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }

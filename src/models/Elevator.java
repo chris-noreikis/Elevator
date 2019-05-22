@@ -76,7 +76,7 @@ public class Elevator {
             return;
         }
 
-        if (isRequestPoolEmpty() && isIdleOnDefaultFloor()) {
+        if (isRequestPoolEmpty() && !isIdleOnDefaultFloor()) {
             int idleCount = getIdleTimeout();
             idleCount += time;
             setIdleTimeout(idleCount);
