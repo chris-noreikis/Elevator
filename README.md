@@ -1,11 +1,12 @@
 ## Usage
 
-- [ ] Person average wait time
-- [ ] Person average ride time 
-- [ ] New simulation input fields
-- [ ] Simulation printout at the end
-- [ ] JUnit tests with coverage
-- [ ] Javadoc
-- [ ] Appendix A; what elevator (if any) should get a floor request
-- [ ] Appendix B; pending request algorithm
+- [x] Person average wait time
+- [x] Person average ride time 
+- [x] New simulation input fields
+- [x] Simulation printout at the end
+- [x] Appendix A; what elevator (if any) should get a floor request
+- [x] Appendix B; pending request algorithm
+- [] Correct movePeopleFromElevator from lecture
+- [] Elevators at capacity
+- [] Update display at more times; when people enter or exit elevator
 

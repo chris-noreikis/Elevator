@@ -2,10 +2,10 @@ package models;
 
 import gui.ElevatorDisplay;
 import gui.ElevatorDisplay.Direction;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 public class Elevator {
     private ArrayList<ElevatorRequest> floorRequests;
@@ -176,7 +176,10 @@ public class Elevator {
         }
 
         setNextElevatorDirection();
+        writeElevatorStateToDisplay();
+    }
 
+    private void writeElevatorStateToDisplay() {
         ElevatorDisplay.getInstance().updateElevator(getId(), getCurrentFloor(), getPeopleOnElevator().size(), getElevatorDirection());
     }
 
@@ -268,26 +271,18 @@ public class Elevator {
         ElevatorLogger.getInstance()
                 .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
 
-        ArrayList<Person> movedPeople = new ArrayList<>();
-        for (int i = 0; i < floor.getNumberOfPeopleInLine(); i++) {
-            Person p = floor.getPersonInLine(i);
-            if (p.isDirectionOfTravel(getElevatorDirection()) && isElevatorSpaceAvailable()) {
-                movedPeople.add(p);
-                peopleOnElevator.add(p);
-                ElevatorLogger.getInstance().logAction("Person " + p.getId() + " entered Elevator " + getId() + " " + getRidersText());
-                p.startElevatorRide();
-                Direction dir = ElevatorDirection.determineDirection(p.getStartFloor(), p.getEndFloor());
-                ElevatorRequest newRequest = new ElevatorRequest(dir, p.getEndFloor());
-                if (!riderRequests.contains(newRequest)) {
-                    riderRequests.add(newRequest);
-                }
-                ElevatorLogger.getInstance().logAction("Elevator " + getId() +
-                        " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
-            }
-        }
-
+        ArrayList<Person> movedPeople = Building.getInstance().getPeopleOnFloorTravellingInDirection(getCurrentFloor(), getElevatorDirection());
         for (Person p : movedPeople) {
-            floor.removeWaitingPerson(p);
+            peopleOnElevator.add(p);
+            ElevatorLogger.getInstance().logAction("Person " + p.getId() + " entered Elevator " + getId() + " " + getRidersText());
+            p.startElevatorRide();
+            Direction dir = ElevatorDirection.determineDirection(p.getStartFloor(), p.getEndFloor());
+            ElevatorRequest newRequest = new ElevatorRequest(dir, p.getEndFloor());
+            if (!riderRequests.contains(newRequest)) {
+                riderRequests.add(newRequest);
+            }
+            ElevatorLogger.getInstance().logAction("Elevator " + getId() +
+                    " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
         }
     }
 
@@ -308,13 +303,16 @@ public class Elevator {
         }
         riderRequests = filteredRiderRequests;
 
-        ArrayList<Person> filteredPeople = new ArrayList<>(peopleOnElevator);
-        for (Person p : filteredPeople) {
+        ArrayList<Person> filteredPeople = new ArrayList<>();
+        Iterator<Person> personIterator = peopleOnElevator.iterator();
+        while (personIterator.hasNext()) {
+            Person p = personIterator.next();
             if (p.isAtDestinationFloor(currentFloor)) {
-                peopleOnElevator.remove(p);
+                personIterator.remove();
+                filteredPeople.add(p);
                 p.endElevatorRide();
                 ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getId() + " " + getRidersText());
-                Building.getInstance().getFloor(currentFloor).addDonePerson(p);
+                Building.getInstance().addDonePeople(getCurrentFloor(), filteredPeople);
             }
         }
     }
@@ -340,7 +338,7 @@ public class Elevator {
     }
 
     private String getRequestText() {
-        return  getCurrentFloorRequestsText() + getRiderRequestsText();
+        return getCurrentFloorRequestsText() + getRiderRequestsText();
     }
 
     private String getRiderRequestsText() {

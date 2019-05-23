@@ -17,7 +17,7 @@ public class ElevatorTestDriver {
     public void runTests() throws InterruptedException, InvalidValueException {
 //        testOne();
 //        testTwo();
-//        testThree();
+        testThree();
 //        testFour();
         partTwo();
 
@@ -28,7 +28,7 @@ public class ElevatorTestDriver {
     }
 
     private void testOne() throws InterruptedException, InvalidValueException {
-        for (int time = 0; time < 50; time++) {
+        for (int time = 0; time < 25; time++) {
 
             if (time == 0) {
                 addPerson(1, 10);

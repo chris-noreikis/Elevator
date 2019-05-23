@@ -2,6 +2,9 @@ package models;
 
 import java.util.ArrayList;
 import java.lang.*;
+import java.util.Iterator;
+
+import gui.ElevatorDisplay.Direction;
 
 public class Floor {
     private ArrayList<Person> waitingPersons;
@@ -21,32 +24,23 @@ public class Floor {
         waitingPersons.add(p);
     }
 
-    public void addDonePerson(Person p) throws InvalidValueException {
-        if (donePersons.contains(p)) {
-            throw new InvalidValueException("Person " + p + " is already on floor " + getFloorNumber());
-        }
-
-        donePersons.add(p);
+    public void addDonePeople(ArrayList<Person> people) throws InvalidValueException {
+        donePersons.addAll(people);
     }
 
-    public int getNumberOfPeopleInLine() {
-        return waitingPersons.size();
-    }
+    public ArrayList<Person> getPeopleTravellingInDirection(Direction d) throws InvalidValueException {
+        ArrayList<Person> people = new ArrayList<>();
 
-    public Person getPersonInLine(int spotInLine) throws InvalidValueException {
-        try {
-            return waitingPersons.get(spotInLine);
-        } catch (IndexOutOfBoundsException e) {
-            throw new InvalidValueException("Spot in line nonexistent.");
-        }
-    }
-
-    public void removeWaitingPerson(Person p) throws InvalidValueException {
-        if (!waitingPersons.contains(p)) {
-            throw new InvalidValueException("Floor " + getFloorNumber() + " does not contain waiting person " + p);
+        Iterator<Person> iter = waitingPersons.iterator();
+        while (iter.hasNext()) {
+            Person p = iter.next();
+            if (p.isDirectionOfTravel(d)) {
+                people.add(p);
+                iter.remove();
+            }
         }
 
-        waitingPersons.remove(p);
+        return people;
     }
 
     public int getFloorNumber() {

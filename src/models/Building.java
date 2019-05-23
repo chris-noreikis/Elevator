@@ -3,9 +3,7 @@ package models;
 import java.util.ArrayList;
 
 import configuration.SimulationConfiguration;
-import configuration.SimulationDefinable;
-import configuration.ConfigurationException;
-import configuration.ElevatorConfigurationFactory;
+import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
 
 public class Building {
@@ -55,6 +53,15 @@ public class Building {
             String formattedErrorMessage = String.format("%s; expected 1-%d, got %d", errorMessage, maxFloor, floorNumber);
             throw new InvalidValueException(formattedErrorMessage);
         }
+    }
+
+    public ArrayList<Person> getPeopleOnFloorTravellingInDirection(int floorNumber, Direction direction) throws InvalidValueException {
+        Floor f = getFloor(floorNumber);
+        return f.getPeopleTravellingInDirection(direction);
+    }
+
+    public void addDonePeople(int floorNum, ArrayList<Person> donePeople) throws InvalidValueException {
+        getFloor(floorNum).addDonePeople(donePeople);
     }
 
     public String toString() {
