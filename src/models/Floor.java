@@ -25,6 +25,10 @@ public class Floor {
     }
 
     public void addDonePeople(ArrayList<Person> people) throws InvalidValueException {
+        if (people == null) {
+            throw new InvalidValueException("People cannot be null");
+        }
+        
         donePersons.addAll(people);
     }
 

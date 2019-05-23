@@ -1,6 +1,7 @@
 package models;
 
 import configuration.SimulationConfiguration;
+import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
         }
     }
 
-    public Elevator getElevator(int id) throws InvalidValueException {
+    private Elevator getElevator(int id) throws InvalidValueException {
         try {
             return elevators.get(id - 1);
         } catch (IndexOutOfBoundsException ex) {
@@ -75,7 +76,22 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
         return pendingRequestProcessor.processPendingRequests();
     }
 
-    @Override
+    public boolean isElevatorOnFloor(int elevatorId, int floorNum) throws InvalidValueException {
+        return getElevator(elevatorId).getCurrentFloor() == floorNum;
+    }
+
+    public boolean isElevatorInDesiredDirection(int elevatorId, int floorNum, Direction elevatorDirection) throws InvalidValueException {
+        return getElevator(elevatorId).isInDesiredDirection(floorNum, elevatorDirection);
+    }
+
+    public Direction getElevatorDirection(int elevatorId) throws InvalidValueException {
+        return getElevator(elevatorId).getElevatorDirection();
+    }
+
+    public void addFloorRequestToElevator(int elevatorNumber, ElevatorRequest elevatorRequest) throws InvalidValueException {
+        getElevator(elevatorNumber).addFloorRequest(elevatorRequest);
+    }
+
     public void addPendingRequest(ElevatorRequest e) throws InvalidValueException {
         if (e == null) {
             throw new InvalidValueException("Elevator request cannot be null");
