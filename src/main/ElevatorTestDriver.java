@@ -17,7 +17,7 @@ public class ElevatorTestDriver {
     public void runTests() throws InterruptedException, InvalidValueException {
 //        testOne();
 //        testTwo();
-        testThree();
+//        testThree();
 //        testFour();
         partTwo();
 
@@ -57,16 +57,18 @@ public class ElevatorTestDriver {
         for (int time = 0; time < 70; time++) {
 
             if (time == 0) {
-                addPerson(4, 15);
+                addPerson(3, 6);
+                addPerson(3, 6);
+                addPerson(3, 6);
             }
 
-            if (time == 1) {
-                addPerson(3, 16);
-            }
-
-            if (time == 12) {
-                addPerson(12, 16);
-            }
+//            if (time == 1) {
+//                addPerson(3, 16);
+//            }
+//
+//            if (time == 12) {
+//                addPerson(12, 16);
+//            }
 
             moveElevators(1000);
         }
@@ -132,6 +134,9 @@ public class ElevatorTestDriver {
     }
 
     private void printMaxMinWaitTimes() {
+        System.out.println();
+        System.out.println("Avg | Min | Max Wait + Ride Times");
+        System.out.println("---------------------------------");
         double averageWaitTime = getAverageWaitTime();
         double averageRideTime = getAverageRideTime();
         Person minWaitPerson = getMinWaitPerson();
@@ -178,18 +183,22 @@ public class ElevatorTestDriver {
     }
 
     private void printTable() throws InvalidValueException {
-        String string = String.format("%10s %15s %15s %15s %15s %15s %15s",
+        System.out.println();
+        System.out.println("Person Ride Logs");
+        System.out.println("----------------");
+
+        String string = String.format("%6s %15s %15s %15s %15s %15s %15s",
                 "Person", "Start Floor", "End Floor", "Direction", "Wait Time", "Ride Time", "Total Time");
         System.out.println(string);
 
-        string = String.format("%10s %15s %15s %15s %15s %15s %15s",
+        string = String.format("%6s %15s %15s %15s %15s %15s %15s",
                 "------", "-----------", "---------", "---------", "---------", "---------", "----------");
         System.out.println(string);
 
         for (Person person : people) {
             Direction d = ElevatorDirection.determineDirection(person.getStartFloor(), person.getEndFloor());
             double totalTime = person.getWaitTime() + person.getRideTime();
-            string = String.format("%10s %15d %15d %15s %15.1f %15.1f %15.1f\n",
+            string = String.format("%6s %15d %15d %15s %15.1f %15.1f %15.1f\n",
                     person.getId(), person.getStartFloor(), person.getEndFloor(), d, person.getWaitTime(), person.getRideTime(), totalTime);
             System.out.print(string);
         }

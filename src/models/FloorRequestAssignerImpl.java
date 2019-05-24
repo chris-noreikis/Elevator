@@ -14,21 +14,25 @@ public class FloorRequestAssignerImpl implements FloorRequestAssigner {
         int numElevators = SimulationConfiguration.getInstance().getNumberOfElevators();
 
         for (int i = 1; i <= numElevators; i++) {
-            if (elevatorController.isElevatorOnFloor(i, requestFloor) && (elevatorController.getElevatorDirection(i) == Direction.IDLE || elevatorController.getElevatorDirection(i) == requestDirection)) {
+            boolean isIdleOrInDirection = (elevatorController.getElevatorDirection(i) == Direction.IDLE || elevatorController.getElevatorDirection(i) == requestDirection);
+            boolean isSpaceOpen = elevatorController.isElevatorSpaceOpen(i);
+            if (elevatorController.isElevatorOnFloor(i, requestFloor) && isIdleOrInDirection && isSpaceOpen) {
                 elevatorController.addFloorRequestToElevator(i, elevatorRequest);
                 return;
             }
         }
 
         for (int i = 1; i <= numElevators; i++) {
-            if (elevatorController.getElevatorDirection(i) != Direction.IDLE && elevatorController.isElevatorInDesiredDirection(i, requestFloor, requestDirection)) {
+            boolean isSpaceOpen = elevatorController.isElevatorSpaceOpen(i);
+            if (elevatorController.getElevatorDirection(i) != Direction.IDLE && elevatorController.isElevatorInDesiredDirection(i, requestFloor, requestDirection) && isSpaceOpen) {
                 elevatorController.addFloorRequestToElevator(i, elevatorRequest);
                 return;
             }
         }
 
         for (int i = 1; i <= numElevators; i++) {
-            if (elevatorController.getElevatorDirection(i) == Direction.IDLE) {
+            boolean isSpaceOpen = elevatorController.isElevatorSpaceOpen(i);
+            if (elevatorController.getElevatorDirection(i) == Direction.IDLE && isSpaceOpen) {
                 elevatorController.addFloorRequestToElevator(i, elevatorRequest);
                 return;
             }

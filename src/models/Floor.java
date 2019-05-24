@@ -28,26 +28,28 @@ public class Floor {
         if (people == null) {
             throw new InvalidValueException("People cannot be null");
         }
-        
+
         donePersons.addAll(people);
     }
 
-    public ArrayList<Person> getPeopleTravellingInDirection(Direction d) throws InvalidValueException {
-        ArrayList<Person> people = new ArrayList<>();
-
-        Iterator<Person> iter = waitingPersons.iterator();
-        while (iter.hasNext()) {
-            Person p = iter.next();
+    public Person peekNextPerson(Direction d) throws InvalidValueException {
+        for (Person p : waitingPersons) {
             if (p.isDirectionOfTravel(d)) {
-                people.add(p);
-                iter.remove();
+                return p;
             }
         }
 
-        return people;
+        return null;
     }
 
-    public int getFloorNumber() {
+    public void removePerson(Person p) throws InvalidValueException {
+        if (!waitingPersons.contains(p)) {
+            throw new InvalidValueException("Person " + p + " is not waiting on Floor " + getFloorNumber());
+        }
+        waitingPersons.remove(p);
+    }
+
+    private int getFloorNumber() {
         return floorNumber;
     }
 

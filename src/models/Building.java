@@ -30,7 +30,7 @@ public class Building {
         }
     }
 
-    public Floor getFloor(int floorNumber) throws InvalidValueException {
+    private Floor getFloor(int floorNumber) throws InvalidValueException {
         checkFloor("getFloor called with invalid floor", floorNumber);
         return floors.get(floorNumber - 1);
     }
@@ -55,9 +55,19 @@ public class Building {
         }
     }
 
-    public ArrayList<Person> getPeopleOnFloorTravellingInDirection(int floorNumber, Direction direction) throws InvalidValueException {
-        Floor f = getFloor(floorNumber);
-        return f.getPeopleTravellingInDirection(direction);
+    public Person peekNextPerson(int floorNumber, Direction direction) throws InvalidValueException {
+        Building.getInstance().checkFloor("Invalid floor number", floorNumber);
+        if (direction == null) {
+            throw new InvalidValueException("Direction cannot be null");
+        }
+
+        return getFloor(floorNumber).peekNextPerson(direction);
+    }
+
+    public void removePerson(int floorNumber, Person p) throws InvalidValueException {
+        Building.getInstance().checkFloor("Invalid floor number", floorNumber);
+
+        getFloor(floorNumber).removePerson(p);
     }
 
     public void addDonePeople(int floorNum, ArrayList<Person> donePeople) throws InvalidValueException {

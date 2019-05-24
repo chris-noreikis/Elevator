@@ -260,20 +260,23 @@ public class Elevator {
         return sortedRequests;
     }
 
-    private void removeFloorRequests(Floor f) {
-        floorRequests.removeIf(request -> request.getDirection() == getElevatorDirection() && request.getFloorNumber() == f.getFloorNumber());
+    private void removeFloorRequests() {
+        floorRequests.removeIf(request -> request.getDirection() == getElevatorDirection() && request.getFloorNumber() == getCurrentFloor());
     }
 
     private void movePeopleFromFloorToElevator() throws InvalidValueException {
-        Floor floor = Building.getInstance().getFloor(currentFloor);
-        removeFloorRequests(floor);
+        removeFloorRequests();
 
         ElevatorLogger.getInstance()
                 .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Floor Request " + getRequestText());
 
-        ArrayList<Person> movedPeople = Building.getInstance().getPeopleOnFloorTravellingInDirection(getCurrentFloor(), getElevatorDirection());
-        for (Person p : movedPeople) {
+
+        Person p = Building.getInstance().peekNextPerson(getCurrentFloor(), getElevatorDirection());
+
+        while (p != null && isElevatorSpaceAvailable()) {
             peopleOnElevator.add(p);
+            Building.getInstance().removePerson(getCurrentFloor(), p);
+
             ElevatorLogger.getInstance().logAction("Person " + p.getId() + " entered Elevator " + getId() + " " + getRidersText());
             p.startElevatorRide();
             Direction dir = ElevatorDirection.determineDirection(p.getStartFloor(), p.getEndFloor());
@@ -283,11 +286,22 @@ public class Elevator {
             }
             ElevatorLogger.getInstance().logAction("Elevator " + getId() +
                     " Rider Request made for Floor " + newRequest.getFloorNumber() + " " + getRequestText());
+
+            p = Building.getInstance().peekNextPerson(getCurrentFloor(), getElevatorDirection());
+        }
+
+        if (p != null) {
+            ElevatorRequest e = new ElevatorRequest(ElevatorDirection.determineDirection(p.getStartFloor(), p.getEndFloor()), p.getStartFloor());
+            ElevatorController.getInstance().addElevatorRequest(e, p);
         }
     }
 
-    private boolean isElevatorSpaceAvailable() {
-        return peopleOnElevator.size() < getCapacity();
+    private int getRemainingElevatorCapacity() {
+        return getCapacity() - peopleOnElevator.size();
+    }
+
+    public boolean isElevatorSpaceAvailable() {
+        return getRemainingElevatorCapacity() > 0;
     }
 
     private void movePeopleFromElevatorToFloor() throws InvalidValueException {

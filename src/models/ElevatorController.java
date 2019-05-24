@@ -106,6 +106,11 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
         pendingRequestProcessor.addPendingRequest(e);
     }
 
+    public boolean isElevatorSpaceOpen(int elevatorId) throws InvalidValueException {
+        checkElevatorExists(elevatorId);
+        return getElevator(elevatorId).isElevatorSpaceAvailable();
+    }
+
     public String toString() {
         String output = "Elevator Controller report ...\n";
 
