@@ -21,12 +21,17 @@ public class Floor {
         if (waitingPersons.contains(p)) {
             throw new InvalidValueException("Person " + p + " is already waiting to get on floor " + getFloorNumber());
         }
+        ElevatorLogger.getInstance().logAction("Person " + p.getId() + " has entered Floor " + getFloorNumber());
         waitingPersons.add(p);
     }
 
     public void addDonePeople(ArrayList<Person> people) throws InvalidValueException {
         if (people == null) {
             throw new InvalidValueException("People cannot be null");
+        }
+
+        for (Person p : people) {
+            ElevatorLogger.getInstance().logAction("Person " + p.getId() + " has entered Floor " + getFloorNumber());
         }
 
         donePersons.addAll(people);
@@ -46,6 +51,7 @@ public class Floor {
         if (!waitingPersons.contains(p)) {
             throw new InvalidValueException("Person " + p + " is not waiting on Floor " + getFloorNumber());
         }
+        ElevatorLogger.getInstance().logAction("Person " + p.getId() + " has left Floor " + getFloorNumber());
         waitingPersons.remove(p);
     }
 

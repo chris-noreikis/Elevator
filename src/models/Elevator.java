@@ -276,7 +276,6 @@ public class Elevator {
         while (p != null && isElevatorSpaceAvailable()) {
             peopleOnElevator.add(p);
             Building.getInstance().removePerson(getCurrentFloor(), p);
-
             ElevatorLogger.getInstance().logAction("Person " + p.getId() + " entered Elevator " + getId() + " " + getRidersText());
             p.startElevatorRide();
             Direction dir = ElevatorDirection.determineDirection(p.getStartFloor(), p.getEndFloor());
