@@ -3,6 +3,7 @@ package models;
 import configuration.SimulationConfiguration;
 import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 
@@ -41,11 +42,8 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
     }
 
     private Elevator getElevator(int id) throws InvalidValueException {
-        try {
-            return elevators.get(id - 1);
-        } catch (IndexOutOfBoundsException ex) {
-            throw new InvalidValueException("Could not find Elevator with given ID in elevator controller");
-        }
+        checkElevatorExists(id);
+        return elevators.get(id - 1);
     }
 
     public void moveElevators(int time) throws InvalidValueException {
@@ -77,14 +75,22 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
     }
 
     public boolean isElevatorOnFloor(int elevatorId, int floorNum) throws InvalidValueException {
+        checkElevatorExists(elevatorId);
         return getElevator(elevatorId).getCurrentFloor() == floorNum;
     }
 
     public boolean isElevatorInDesiredDirection(int elevatorId, int floorNum, Direction elevatorDirection) throws InvalidValueException {
+        checkElevatorExists(elevatorId);
+        Building.getInstance().checkFloor("Invalid floor number", floorNum);
+        if (elevatorDirection == null) {
+            throw new InvalidValueException("ElevatorDirection cannot be null");
+        }
+
         return getElevator(elevatorId).isInDesiredDirection(floorNum, elevatorDirection);
     }
 
     public Direction getElevatorDirection(int elevatorId) throws InvalidValueException {
+        checkElevatorExists(elevatorId);
         return getElevator(elevatorId).getElevatorDirection();
     }
 
@@ -120,5 +126,13 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
         }
 
         return false;
+    }
+
+    private void checkElevatorExists(int elevatorId) throws InvalidValueException {
+        try {
+            elevators.get(elevatorId - 1);
+        } catch (IndexOutOfBoundsException ex) {
+            throw new InvalidValueException("Could not find Elevator with given ID in elevator controller");
+        }
     }
 }
