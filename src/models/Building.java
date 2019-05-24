@@ -2,6 +2,7 @@ package models;
 
 import java.util.ArrayList;
 
+import configuration.ConfigurationException;
 import configuration.SimulationConfiguration;
 import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
@@ -9,6 +10,12 @@ import gui.ElevatorDisplay;
 public class Building {
     private ArrayList<Floor> floors;
     private static Building instance;
+    private int elevatorSpeed;
+    private int elevatorCapacity;
+    private int returnToDefaultFloorTimeout;
+    private int numberOfElevators;
+    private int doorOpenTime;
+    private int numberOfFloors;
 
     public static Building getInstance() throws InvalidValueException {
         if (instance == null) {
@@ -18,8 +25,50 @@ public class Building {
     }
 
     private Building() throws InvalidValueException {
+        elevatorSpeed = getConfigurationFieldFromJSON("elevatorSpeed");
+        elevatorCapacity = getConfigurationFieldFromJSON("elevatorPersonCapacity");
+        returnToDefaultFloorTimeout = getConfigurationFieldFromJSON("returnToDefaultFloorTimeout");
+        numberOfElevators = getConfigurationFieldFromJSON("elevators");
+        doorOpenTime = getConfigurationFieldFromJSON("doorOpenTime");
+        numberOfFloors = getConfigurationFieldFromJSON("floors");
         ElevatorDisplay.getInstance().initialize(getNumberOfFloors());
         setupFloors();
+    }
+
+    public int getElevatorSpeed() {
+        return elevatorSpeed;
+    }
+
+    public int getElevatorCapacity() {
+        return elevatorCapacity;
+    }
+
+    public int getReturnToDefaultFloorTimeout() {
+        return returnToDefaultFloorTimeout;
+    }
+
+    public int getDoorOpenTime() {
+        return doorOpenTime;
+    }
+
+    public int getNumberOfElevators() { return numberOfElevators; }
+
+    public int getNumberOfFloors() {
+        return numberOfFloors;
+    }
+
+    private int getConfigurationFieldFromJSON(String configurationFieldName) throws InvalidValueException {
+        int configurationValue;
+        try {
+            configurationValue = SimulationConfiguration.getInstance().getConfigurationField(configurationFieldName);
+        } catch (ConfigurationException e) {
+            configurationValue = -1;
+            System.out.println("Building created with invalid configuration, exiting program");
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        return configurationValue;
     }
 
     private void setupFloors() throws InvalidValueException {
@@ -33,10 +82,6 @@ public class Building {
     private Floor getFloor(int floorNumber) throws InvalidValueException {
         checkFloor("getFloor called with invalid floor", floorNumber);
         return floors.get(floorNumber - 1);
-    }
-
-    public int getNumberOfFloors() throws InvalidValueException {
-        return SimulationConfiguration.getInstance().getNumberOfFloors();
     }
 
     public void addPerson(Person person) throws InvalidValueException {

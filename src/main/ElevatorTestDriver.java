@@ -1,5 +1,6 @@
 package main;
 
+import configuration.ConfigurationException;
 import configuration.SimulationConfiguration;
 import models.*;
 import gui.ElevatorDisplay.Direction;
@@ -13,17 +14,17 @@ public class ElevatorTestDriver {
     private ArrayList<Person> people = new ArrayList<>();
     private Random randomObject = new Random(1234);
 
-    public void runTests() throws InterruptedException, InvalidValueException {
+    public void runTests() throws InterruptedException, InvalidValueException, ConfigurationException {
 //        testOne();
 //        testTwo();
 //        testThree();
 //        testFour();
         partTwo();
 
-        ElevatorDisplay.getInstance().shutdown();
         SimulationResultsPrinter printer = new SimulationResultsPrinter(people);
         printer.printMaxMinWaitTimes();
         printer.printRideLogs();
+        ElevatorDisplay.getInstance().shutdown();
     }
 
     private void testOne() throws InterruptedException, InvalidValueException {
@@ -96,9 +97,9 @@ public class ElevatorTestDriver {
         }
     }
 
-    private void partTwo() throws InterruptedException, InvalidValueException {
-        int simulationDuration = SimulationConfiguration.getInstance().getSimulationDuration();
-        int personCreationRate = SimulationConfiguration.getInstance().getPersonCreationRate();
+    private void partTwo() throws InterruptedException, InvalidValueException, ConfigurationException {
+        int simulationDuration = SimulationConfiguration.getInstance().getConfigurationField("simulationDuration");
+        int personCreationRate = SimulationConfiguration.getInstance().getConfigurationField("personCreationRate");
         for (int time = 0; time < simulationDuration; time++) {
 
             if (time % personCreationRate == 0) {

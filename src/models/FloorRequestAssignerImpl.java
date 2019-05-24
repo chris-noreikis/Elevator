@@ -11,7 +11,7 @@ public class FloorRequestAssignerImpl implements FloorRequestAssigner {
         int requestFloor = elevatorRequest.getFloorNumber();
         Direction requestDirection = elevatorRequest.getDirection();
 
-        int numElevators = SimulationConfiguration.getInstance().getNumberOfElevators();
+        int numElevators = Building.getInstance().getNumberOfElevators();
 
         for (int i = 1; i <= numElevators; i++) {
             boolean isIdleOrInDirection = (elevatorController.getElevatorDirection(i) == Direction.IDLE || elevatorController.getElevatorDirection(i) == requestDirection);

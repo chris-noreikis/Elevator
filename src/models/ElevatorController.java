@@ -1,9 +1,7 @@
 package models;
 
-import configuration.SimulationConfiguration;
 import gui.ElevatorDisplay.Direction;
 import gui.ElevatorDisplay;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 
@@ -29,11 +27,11 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
     }
 
     private void setupElevators() throws InvalidValueException {
-        int numElevators = SimulationConfiguration.getInstance().getNumberOfElevators();
-        int elevatorCapacity = SimulationConfiguration.getInstance().getElevatorCapacity();
-        int elevatorSpeed = SimulationConfiguration.getInstance().getElevatorSpeed();
-        int doorOpenTime = SimulationConfiguration.getInstance().getDoorOpenTime();
-        int returnToFirstFloorAfter = SimulationConfiguration.getInstance().getReturnToDefaultFloorTimeout();
+        int numElevators = Building.getInstance().getNumberOfElevators();
+        int elevatorCapacity = Building.getInstance().getElevatorCapacity();
+        int elevatorSpeed = Building.getInstance().getElevatorSpeed();
+        int doorOpenTime = Building.getInstance().getDoorOpenTime();
+        int returnToFirstFloorAfter = Building.getInstance().getReturnToDefaultFloorTimeout();
         elevators = new ArrayList<>();
         for (int elevatorID = 1; elevatorID <= numElevators; elevatorID++) {
             elevators.add(new Elevator(elevatorID, elevatorCapacity, elevatorSpeed, doorOpenTime, returnToFirstFloorAfter));

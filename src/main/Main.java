@@ -1,6 +1,7 @@
 
 package main;
 
+import configuration.ConfigurationException;
 import models.InvalidValueException;
 
 /**
@@ -11,7 +12,7 @@ public class Main {
         ElevatorTestDriver d = new ElevatorTestDriver();
         try {
             d.runTests();
-        } catch (InvalidValueException e) {
+        } catch (InvalidValueException | ConfigurationException e) {
             e.printStackTrace();
         }
     }
