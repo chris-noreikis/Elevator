@@ -31,7 +31,7 @@ public class Person {
         return id;
     }
 
-    private void setId(String idIn) {
+    private void setId(String idIn) throws InvalidValueException {
         this.id = idIn;
     }
 
@@ -90,7 +90,7 @@ public class Person {
         return rideEnd;
     }
 
-    public void endRiding(long rideEnd) {
+    public void endRiding(long rideEnd) throws InvalidValueException {
         this.rideEnd = System.currentTimeMillis();
     }
 
