@@ -8,15 +8,15 @@ import java.util.Comparator;
 
 public class SimulationResultsPrinter {
     ArrayList<Person> people;
-    public SimulationResultsPrinter(ArrayList<Person> peopleIn) {
+    public SimulationResultsPrinter(ArrayList<Person> peopleIn) throws InvalidValueException {
         setPeople(peopleIn);
     }
 
-    public void setPeople(ArrayList<Person> peopleIn) {
+    public void setPeople(ArrayList<Person> peopleIn) throws InvalidValueException{
         this.people = peopleIn;
     }
 
-    public void printMaxMinWaitTimes() {
+    public void printMaxMinWaitTimes() throws InvalidValueException {
         System.out.println();
         System.out.println("Avg | Min | Max Wait + Ride Times");
         System.out.println("---------------------------------");
