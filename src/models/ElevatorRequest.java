@@ -27,9 +27,7 @@ public class ElevatorRequest {
     }
 
     private void setFloor(int floor) throws InvalidValueException {
-        if (floor < 0) {
-            throw new InvalidValueException("Floor is less than 0.");
-        }
+        Building.getInstance().checkFloor("Invalid floor", floor);
         this.floor = floor;
     }
 

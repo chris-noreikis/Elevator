@@ -11,6 +11,9 @@ public class JsonReader implements ConfigurationReader {
     private JSONObject configurationJSON;
 
     public JsonReader(String configurationFilePath) throws ConfigurationException {
+        if (configurationFilePath == null) {
+            throw new ConfigurationException("Configuration File cannot be null");
+        }
         try {
             parseAndSetConfigurationJSON(configurationFilePath);
         } catch (IOException e) {
@@ -20,7 +23,6 @@ public class JsonReader implements ConfigurationReader {
         }
     }
 
-    @Override
     public int getConfigurationFieldInt(String configurationFieldName) throws ConfigurationException {
         int configurationValue;
         try {

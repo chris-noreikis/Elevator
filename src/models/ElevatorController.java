@@ -70,22 +70,26 @@ public class ElevatorController {
     }
 
     public ArrayList<ElevatorRequest> processPendingRequests(int startFloor) throws InvalidValueException {
+        Building.getInstance().checkFloor("Invalid start floor for pending requests", startFloor);
+
         return pendingRequestProcessor.processPendingRequests(startFloor);
     }
 
-    public boolean isElevatorOnFloor(int elevatorId, int floorNum) throws InvalidValueException {
+    public boolean isElevatorOnFloor(int elevatorId, int floorNumber) throws InvalidValueException {
+        Building.getInstance().checkFloor("Elevator cannot be on this floor", floorNumber);
         checkElevatorExists(elevatorId);
-        return getElevator(elevatorId).getCurrentFloor() == floorNum;
+        return getElevator(elevatorId).getCurrentFloor() == floorNumber;
     }
 
-    public boolean isElevatorInDesiredDirection(int elevatorId, int floorNum, Direction elevatorDirection) throws InvalidValueException {
-        checkElevatorExists(elevatorId);
-        Building.getInstance().checkFloor("Invalid floor number", floorNum);
+    public boolean isElevatorInDesiredDirection(int elevatorId, int floorNumber, Direction elevatorDirection) throws InvalidValueException {
         if (elevatorDirection == null) {
             throw new InvalidValueException("ElevatorDirection cannot be null");
         }
 
-        return getElevator(elevatorId).isInDesiredDirection(floorNum, elevatorDirection);
+        checkElevatorExists(elevatorId);
+        Building.getInstance().checkFloor("Invalid floor number", floorNumber);
+
+        return getElevator(elevatorId).isInDesiredDirection(floorNumber, elevatorDirection);
     }
 
     public Direction getElevatorDirection(int elevatorId) throws InvalidValueException {
@@ -93,16 +97,23 @@ public class ElevatorController {
         return getElevator(elevatorId).getElevatorDirection();
     }
 
-    public void addFloorRequestToElevator(int elevatorNumber, ElevatorRequest elevatorRequest) throws InvalidValueException {
-        getElevator(elevatorNumber).addFloorRequest(elevatorRequest);
-    }
-
-    public void addPendingRequest(ElevatorRequest e) throws InvalidValueException {
-        if (e == null) {
+    public void addFloorRequestToElevator(int elevatorId, ElevatorRequest elevatorRequest) throws InvalidValueException {
+        if (elevatorRequest == null) {
             throw new InvalidValueException("Elevator request cannot be null");
         }
+        Building.getInstance().checkFloor("Invalid Elevator Request", elevatorRequest.getFloorNumber());
 
-        pendingRequestProcessor.addPendingRequest(e);
+        checkElevatorExists(elevatorId);
+        getElevator(elevatorId).addFloorRequest(elevatorRequest);
+    }
+
+    public void addPendingRequest(ElevatorRequest elevatorRequest) throws InvalidValueException {
+        if (elevatorRequest == null) {
+            throw new InvalidValueException("Elevator request cannot be null");
+        }
+        Building.getInstance().checkFloor("Invalid Elevator Request", elevatorRequest.getFloorNumber());
+
+        pendingRequestProcessor.addPendingRequest(elevatorRequest);
     }
 
     public boolean isElevatorSpaceOpen(int elevatorId) throws InvalidValueException {

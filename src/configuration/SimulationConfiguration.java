@@ -1,5 +1,7 @@
 package configuration;
 
+import sun.security.krb5.Config;
+
 public class SimulationConfiguration {
     private static SimulationConfiguration instance;
     private static ConfigurationReader simulationConfiguration;
@@ -13,6 +15,10 @@ public class SimulationConfiguration {
     }
 
     public int getConfigurationField(String configurationFieldName) throws ConfigurationException {
+        if (configurationFieldName == null) {
+            throw new ConfigurationException("Configuration field name cannot be null");
+        }
+
         return simulationConfiguration.getConfigurationFieldInt(configurationFieldName);
     }
 }

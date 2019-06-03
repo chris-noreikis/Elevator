@@ -57,7 +57,7 @@ public class Building {
         return numberOfFloors;
     }
 
-    private int getConfigurationFieldFromJSON(String configurationFieldName) throws InvalidValueException {
+    private int getConfigurationFieldFromJSON(String configurationFieldName)  {
         int configurationValue;
         try {
             configurationValue = SimulationConfiguration.getInstance().getConfigurationField(configurationFieldName);
@@ -85,6 +85,10 @@ public class Building {
     }
 
     public void addPerson(Person person) throws InvalidValueException {
+        if (person == null) {
+            throw new InvalidValueException("Person cannot be null");
+        }
+
         checkFloor("Person is starting on a floor that doesn\'t exist", person.getStartFloor());
         checkFloor("Person is trying to get to a floor that doesn\'t exist", person.getEndFloor());
 
@@ -101,22 +105,32 @@ public class Building {
     }
 
     public Person peekNextPerson(int floorNumber, Direction direction) throws InvalidValueException {
-        Building.getInstance().checkFloor("Invalid floor number", floorNumber);
         if (direction == null) {
             throw new InvalidValueException("Direction cannot be null");
         }
 
+        Building.getInstance().checkFloor("Invalid floor number", floorNumber);
+
         return getFloor(floorNumber).peekNextPerson(direction);
     }
 
-    public void removePerson(int floorNumber, Person p) throws InvalidValueException {
+    public void removePersonFromFloor(int floorNumber, Person p) throws InvalidValueException {
+        if (p == null) {
+            throw new InvalidValueException("Person cannot be null");
+        }
         Building.getInstance().checkFloor("Invalid floor number", floorNumber);
 
         getFloor(floorNumber).removePerson(p);
     }
 
-    public void addDonePeople(int floorNum, ArrayList<Person> donePeople) throws InvalidValueException {
-        getFloor(floorNum).addDonePeople(donePeople);
+    public void addDonePeople(int floorNumber, ArrayList<Person> donePeople) throws InvalidValueException {
+        if (donePeople == null) {
+            throw new InvalidValueException("People cannot be null");
+        }
+
+        Building.getInstance().checkFloor("Invalid floor number", floorNumber);
+
+        getFloor(floorNumber).addDonePeople(donePeople);
     }
 
     public String toString() {

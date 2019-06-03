@@ -39,6 +39,10 @@ public class Elevator {
     }
 
     public void addFloorRequest(ElevatorRequest elevatorRequest) throws InvalidValueException {
+        if (elevatorRequest == null) {
+            throw new InvalidValueException("Elevator Request cannot be null");
+        }
+
         Building.getInstance().checkFloor("Invalid floor request: ", elevatorRequest.getFloorNumber());
 
         int requestFloorElevator = elevatorRequest.getFloorNumber();
@@ -96,11 +100,11 @@ public class Elevator {
     }
 
     public boolean isInDesiredDirection(int requestFloor, Direction requestDirection) throws InvalidValueException {
-        Building.getInstance().checkFloor("Invalid request floor", requestFloor);
-
         if (requestDirection == null) {
             throw new InvalidValueException("Request direction cannot be null");
         }
+
+        Building.getInstance().checkFloor("Invalid request floor", requestFloor);
 
         ArrayList<ElevatorRequest> elevatorRequests = getSortedRequests();
         if (elevatorRequests.size() > 0) {
@@ -272,7 +276,7 @@ public class Elevator {
 
         while (p != null && isElevatorSpaceAvailable()) {
             peopleOnElevator.add(p);
-            Building.getInstance().removePerson(getCurrentFloor(), p);
+            Building.getInstance().removePersonFromFloor(getCurrentFloor(), p);
             ElevatorLogger.getInstance().logAction("Person " + p.getId() + " entered Elevator " + getId() + " " + getRidersText());
             p.startElevatorRide();
             Direction dir = ElevatorDirection.determineDirection(p.getStartFloor(), p.getEndFloor());

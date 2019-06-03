@@ -15,63 +15,14 @@ public class ElevatorTestDriver {
     private Random randomObject = new Random(1234);
 
     public void runTests() throws InterruptedException, InvalidValueException, ConfigurationException {
-//        testOne();
-//        testTwo();
-//        testThree();
-        testFour();
-//        partTwo();
+//        testFour();
+        partTwo();
 
-        SimulationResultsPrinter printer = new SimulationResultsPrinter(people);
-        printer.printMaxMinWaitTimes();
-        printer.printRideLogs();
+        SimulationReport report = new SimulationReport(people);
+        report.printMaxMinWaitTimes();
+        report.printRideLogs();
+        report.printBuildingReport();
         ElevatorDisplay.getInstance().shutdown();
-    }
-
-    private void testOne() throws InterruptedException, InvalidValueException {
-        for (int time = 0; time < 25; time++) {
-
-            if (time == 0) {
-                addPerson(1, 10);
-            }
-
-            moveElevators(1000);
-        }
-    }
-
-    private void testTwo() throws InterruptedException, InvalidValueException {
-        for (int time = 0; time < 70; time++) {
-
-            if (time == 0) {
-                addPerson(20, 5);
-            }
-
-            if (time == 5) {
-                addPerson(15, 19);
-            }
-
-            moveElevators(1000);
-        }
-    }
-
-    private void testThree() throws InterruptedException, InvalidValueException {
-        for (int time = 0; time < 70; time++) {
-
-            if (time == 0) {
-                addPerson(3, 6);
-                addPerson(3, 6);
-                addPerson(3, 6);
-            }
-
-//            if (time == 1) {
-//                addPerson(3, 16);
-//            }
-//
-//            if (time == 12) {
-//                addPerson(12, 16);
-//            }
-
-            moveElevators(1000);
-        }
     }
 
     private void testFour() throws InterruptedException, InvalidValueException {

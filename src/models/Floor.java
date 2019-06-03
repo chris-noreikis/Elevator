@@ -2,7 +2,6 @@ package models;
 
 import java.util.ArrayList;
 import java.lang.*;
-import java.util.Iterator;
 
 import gui.ElevatorDisplay.Direction;
 

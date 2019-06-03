@@ -6,14 +6,14 @@ import models.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class SimulationResultsPrinter {
-    ArrayList<Person> people;
-    
-    public SimulationResultsPrinter(ArrayList<Person> peopleIn) throws InvalidValueException {
+public class SimulationReport {
+    private ArrayList<Person> people;
+
+    public SimulationReport(ArrayList<Person> peopleIn) throws InvalidValueException {
         setPeople(peopleIn);
     }
 
-    public void setPeople(ArrayList<Person> peopleIn) throws InvalidValueException {
+    private void setPeople(ArrayList<Person> peopleIn) throws InvalidValueException {
         if (peopleIn == null) {
             throw new InvalidValueException("People cannot be null");
         }
@@ -92,7 +92,7 @@ public class SimulationResultsPrinter {
         }
     }
 
-    public void printReport() throws InvalidValueException {
+    public void printBuildingReport() throws InvalidValueException {
         System.out.println("");
         System.out.println(Building.getInstance());
         System.out.println("");
