@@ -1,7 +1,5 @@
 package configuration;
 
-import sun.security.krb5.Config;
-
 public class SimulationConfiguration {
     private static SimulationConfiguration instance;
     private static ConfigurationReader simulationConfiguration;

@@ -1,10 +1,10 @@
 {
   "floors": 20,
   "elevators": 4,
-  "elevatorPersonCapacity": 5,
+  "elevatorPersonCapacity": 10,
   "elevatorSpeed": 1000,
   "doorOpenTime": 2000,
   "returnToDefaultFloorTimeout": 5000,
-  "simulationDuration": 10,
+  "simulationDuration": 120,
   "personCreationRate": 3
 }

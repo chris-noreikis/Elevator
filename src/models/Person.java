@@ -44,8 +44,11 @@ public class Person {
         return floorNum == getEndFloor();
     }
 
-    public boolean isDirectionOfTravel(Direction d) throws InvalidValueException {
-        return d == ElevatorDirection.determineDirection(startFloor, endFloor);
+    public boolean isDirectionOfTravel(Direction direction) throws InvalidValueException {
+        if (direction == null) {
+            throw new InvalidValueException("Direction cannot be null");
+        }
+        return direction == ElevatorDirection.determineDirection(startFloor, endFloor);
     }
 
     public String toString() {
@@ -62,7 +65,7 @@ public class Person {
         this.endFloor = endFloor;
     }
 
-    public long getWaitStart() {
+    private long getWaitStart() {
         return waitStart;
     }
 
@@ -70,7 +73,7 @@ public class Person {
         this.waitStart = System.currentTimeMillis();
     }
 
-    public long getWaitEnd() {
+    private long getWaitEnd() {
         return waitEnd;
     }
 
@@ -84,11 +87,11 @@ public class Person {
         this.rideEnd = System.currentTimeMillis();
     }
 
-    public long getRideStart() {
+    private long getRideStart() {
         return rideStart;
     }
 
-    public long getRideEnd() {
+    private long getRideEnd() {
         return rideEnd;
     }
 

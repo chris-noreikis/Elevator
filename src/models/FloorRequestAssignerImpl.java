@@ -4,6 +4,11 @@ import gui.ElevatorDisplay.Direction;
 
 public class FloorRequestAssignerImpl implements FloorRequestAssigner {
     public void assignElevatorRequest(ElevatorRequest elevatorRequest) throws InvalidValueException {
+        if (elevatorRequest == null) {
+            throw new InvalidValueException("Elevator Request cannot be null");
+        }
+        Building.getInstance().checkFloor("Invalid request floor", elevatorRequest.getFloorNumber());
+
         ElevatorController elevatorController = ElevatorController.getInstance();
 
         int requestFloor = elevatorRequest.getFloorNumber();

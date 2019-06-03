@@ -72,8 +72,6 @@ public class SimulationReport {
 
     public void printRideLogs() throws InvalidValueException {
         System.out.println();
-        System.out.println("Person Ride Logs");
-        System.out.println("----------------");
 
         String string = String.format("%6s %15s %15s %15s %15s %15s %15s",
                 "Person", "Start Floor", "End Floor", "Direction", "Wait Time", "Ride Time", "Total Time");

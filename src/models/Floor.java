@@ -36,9 +36,13 @@ public class Floor {
         donePersons.addAll(people);
     }
 
-    public Person peekNextPerson(Direction d) throws InvalidValueException {
+    public Person peekNextPerson(Direction direction) throws InvalidValueException {
+        if (direction == null) {
+            throw new InvalidValueException("Direction cannot be null");
+        }
+
         for (Person p : waitingPersons) {
-            if (p.isDirectionOfTravel(d)) {
+            if (p.isDirectionOfTravel(direction)) {
                 return p;
             }
         }
@@ -47,9 +51,14 @@ public class Floor {
     }
 
     public void removePerson(Person p) throws InvalidValueException {
+        if (p == null) {
+            throw new InvalidValueException("Person cannot be null");
+        }
+
         if (!waitingPersons.contains(p)) {
             throw new InvalidValueException("Person " + p + " is not waiting on Floor " + getFloorNumber());
         }
+
         ElevatorLogger.getInstance().logAction("Person " + p.getId() + " has left Floor " + getFloorNumber());
         waitingPersons.remove(p);
     }
@@ -72,6 +81,7 @@ public class Floor {
         if(floorNumber <= 0) {
             throw new InvalidValueException("Floor number is less than or equal to 0.");
         }
+
         this.floorNumber = floorNumber;
     }
 }
