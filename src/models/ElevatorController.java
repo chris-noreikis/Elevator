@@ -5,7 +5,7 @@ import gui.ElevatorDisplay;
 
 import java.util.ArrayList;
 
-public class ElevatorController implements PendingRequestProcessor, FloorRequestAssigner {
+public class ElevatorController {
     private ArrayList<Elevator> elevators;
     private static ElevatorController instance;
     private PendingRequestProcessor pendingRequestProcessor;
@@ -68,8 +68,8 @@ public class ElevatorController implements PendingRequestProcessor, FloorRequest
         floorRequestAssigner.addElevatorRequest(elevatorRequest, person);
     }
 
-    public ArrayList<ElevatorRequest> processPendingRequests() throws InvalidValueException {
-        return pendingRequestProcessor.processPendingRequests();
+    public ArrayList<ElevatorRequest> processPendingRequests(int startFloor) throws InvalidValueException {
+        return pendingRequestProcessor.processPendingRequests(startFloor);
     }
 
     public boolean isElevatorOnFloor(int elevatorId, int floorNum) throws InvalidValueException {

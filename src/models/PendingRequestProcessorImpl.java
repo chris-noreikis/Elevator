@@ -1,26 +1,26 @@
 package models;
 
-import gui.ElevatorDisplay;
-import org.omg.CORBA.DynAnyPackage.Invalid;
+import gui.ElevatorDisplay.Direction;
 
 import java.util.ArrayList;
 
 public class PendingRequestProcessorImpl implements PendingRequestProcessor {
     private ArrayList<ElevatorRequest> pendingRequests = new ArrayList<>();
 
-    public ArrayList<ElevatorRequest> processPendingRequests() throws InvalidValueException {
+    public ArrayList<ElevatorRequest> processPendingRequests(int startFloor) throws InvalidValueException {
         ArrayList<ElevatorRequest> selectedPendingRequests = new ArrayList<>();
         if (pendingRequests.size() > 0) {
-            ElevatorRequest request = pendingRequests.get(0);
-            selectedPendingRequests.add(request);
+            ElevatorRequest initialRequest = pendingRequests.get(0);
+            Direction directionToInitialRequest = ElevatorDirection.determineDirection(startFloor, initialRequest.getFloorNumber());
+            selectedPendingRequests.add(initialRequest);
 
-            for (int i = 1; i < pendingRequests.size() - 1; i++) {
+            for (int i = 1; i < pendingRequests.size(); i++) {
                 ElevatorRequest nextRequest = pendingRequests.get(i);
-                if (nextRequest.getDirection() == request.getDirection()) {
-                    ElevatorDisplay.Direction nextDirection = ElevatorDirection.determineDirection(request.getFloorNumber(), nextRequest.getFloorNumber());
-                    if (nextRequest.getDirection() == ElevatorDisplay.Direction.UP && nextDirection == ElevatorDisplay.Direction.UP) {
+                if (nextRequest.getDirection() == directionToInitialRequest) {
+                    Direction nextDirection = ElevatorDirection.determineDirection(initialRequest.getFloorNumber(), nextRequest.getFloorNumber());
+                    if (nextRequest.getDirection() == Direction.UP && nextDirection == Direction.UP) {
                         selectedPendingRequests.add(nextRequest);
-                    } else if (nextRequest.getDirection() == ElevatorDisplay.Direction.DOWN && nextDirection == ElevatorDisplay.Direction.DOWN) {
+                    } else if (nextRequest.getDirection() == Direction.DOWN && nextDirection == Direction.DOWN) {
                         selectedPendingRequests.add(nextRequest);
                     }
                 }

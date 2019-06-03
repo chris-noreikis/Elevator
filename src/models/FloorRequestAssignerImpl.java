@@ -1,6 +1,5 @@
 package models;
 
-import configuration.SimulationConfiguration;
 import gui.ElevatorDisplay.Direction;
 
 public class FloorRequestAssignerImpl implements FloorRequestAssigner {

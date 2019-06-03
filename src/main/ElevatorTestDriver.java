@@ -18,8 +18,8 @@ public class ElevatorTestDriver {
 //        testOne();
 //        testTwo();
 //        testThree();
-//        testFour();
-        partTwo();
+        testFour();
+//        partTwo();
 
         SimulationResultsPrinter printer = new SimulationResultsPrinter(people);
         printer.printMaxMinWaitTimes();
@@ -81,16 +81,9 @@ public class ElevatorTestDriver {
                 addPerson(1, 10);
             }
 
-            if (time == 5) {
-                addPerson(8, 17);
-            }
-
-            if (time == 6) {
-                addPerson(1, 9);
-            }
-
-            if (time == 32) {
-                addPerson(3, 1);
+            if (time == 10) {
+                addPerson(8, 4);
+                addPerson(7, 3);
             }
 
             moveElevators(1000);

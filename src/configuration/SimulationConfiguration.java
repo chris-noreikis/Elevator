@@ -1,7 +1,5 @@
 package configuration;
 
-import models.InvalidValueException;
-
 public class SimulationConfiguration {
     private static SimulationConfiguration instance;
     private static ConfigurationReader simulationConfiguration;

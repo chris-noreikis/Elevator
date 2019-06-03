@@ -107,14 +107,12 @@ public class Elevator {
             ElevatorRequest nextRequest = elevatorRequests.get(0);
             if (riderRequests.contains(nextRequest)) {
                 if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection) {
-                    System.out.println("** RIDER REQUEST IN SAME DIR **" + requestFloor);
                     return true;
                 }
             }
 
             if (floorRequests.contains(nextRequest)) {
                 if (isMovingTowardsFloor(requestFloor) && getElevatorDirection() == requestDirection && requestDirection == nextRequest.getDirection()) {
-                    System.out.println("** FLOOR REQUEST IN SAME DIR **" + requestFloor);
                     return true;
                 }
             }
@@ -128,9 +126,8 @@ public class Elevator {
     }
 
     private void processPendingRequests() throws InvalidValueException {
-        ArrayList<ElevatorRequest> requests = ElevatorController.getInstance().processPendingRequests();
+        ArrayList<ElevatorRequest> requests = ElevatorController.getInstance().processPendingRequests(getCurrentFloor());
         for (ElevatorRequest e : requests) {
-            System.out.println("Adding elevator request from pending requests:" + e);
             addFloorRequest(e);
         }
     }
