@@ -303,15 +303,8 @@ public class Elevator {
     private void movePeopleFromElevatorToFloor() throws InvalidValueException {
         ElevatorLogger.getInstance()
                 .logAction("Elevator " + getId() + " has arrived at Floor " + currentFloor + " for Rider Request " + getRequestText());
-        ArrayList<ElevatorRequest> filteredRiderRequests = new ArrayList<>();
-        for (ElevatorRequest request : riderRequests) {
-            if (request.getFloorNumber() == currentFloor) {
-                continue;
-            }
 
-            filteredRiderRequests.add(request);
-        }
-        riderRequests = filteredRiderRequests;
+        riderRequests.removeIf(riderReq -> riderReq.getFloorNumber() == getCurrentFloor());
 
         ArrayList<Person> filteredPeople = new ArrayList<>();
         Iterator<Person> personIterator = peopleOnElevator.iterator();
@@ -322,9 +315,9 @@ public class Elevator {
                 filteredPeople.add(p);
                 p.endElevatorRide();
                 ElevatorLogger.getInstance().logAction("Person " + p.toString() + " has left Elevator " + getId() + " " + getRidersText());
-                Building.getInstance().addDonePeople(getCurrentFloor(), filteredPeople);
             }
         }
+        Building.getInstance().addDonePeople(getCurrentFloor(), filteredPeople);
     }
 
     private void openDoors() throws InvalidValueException {

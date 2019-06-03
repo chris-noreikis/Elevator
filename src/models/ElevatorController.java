@@ -64,8 +64,9 @@ public class ElevatorController {
         }
 
         Building.getInstance().checkFloor("ElevatorController passed an invalid Elevator Request", elevatorRequest.getFloorNumber());
+        ElevatorLogger.getInstance().logAction("Person " + person.getId() + " presses " + elevatorRequest.getDirection() + " button on Floor " + elevatorRequest.getFloorNumber());
 
-        floorRequestAssigner.addElevatorRequest(elevatorRequest, person);
+        floorRequestAssigner.assignElevatorRequest(elevatorRequest);
     }
 
     public ArrayList<ElevatorRequest> processPendingRequests(int startFloor) throws InvalidValueException {

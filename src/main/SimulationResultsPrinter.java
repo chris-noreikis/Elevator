@@ -8,15 +8,20 @@ import java.util.Comparator;
 
 public class SimulationResultsPrinter {
     ArrayList<Person> people;
+    
     public SimulationResultsPrinter(ArrayList<Person> peopleIn) throws InvalidValueException {
         setPeople(peopleIn);
     }
 
-    public void setPeople(ArrayList<Person> peopleIn) throws InvalidValueException{
+    public void setPeople(ArrayList<Person> peopleIn) throws InvalidValueException {
+        if (peopleIn == null) {
+            throw new InvalidValueException("People cannot be null");
+        }
+
         this.people = peopleIn;
     }
 
-    public void printMaxMinWaitTimes() throws InvalidValueException {
+    public void printMaxMinWaitTimes()  {
         System.out.println();
         System.out.println("Avg | Min | Max Wait + Ride Times");
         System.out.println("---------------------------------");

@@ -32,6 +32,9 @@ public class Person {
     }
 
     private void setId(String idIn) throws InvalidValueException {
+        if (idIn == null) {
+            throw new InvalidValueException("Id cannot be null");
+        }
         this.id = idIn;
     }
 
@@ -81,7 +84,6 @@ public class Person {
         this.rideEnd = System.currentTimeMillis();
     }
 
-
     public long getRideStart() {
         return rideStart;
     }
@@ -90,11 +92,7 @@ public class Person {
         return rideEnd;
     }
 
-    public void endRiding(long rideEnd) throws InvalidValueException {
-        this.rideEnd = System.currentTimeMillis();
-    }
+    public double getWaitTime() { return (getWaitEnd() - getWaitStart()) / 1000.0; }
 
-    public double getWaitTime() { return (waitEnd - waitStart) / 1000.0; }
-
-    public double getRideTime() { return (rideEnd - rideStart) / 1000.0; }
+    public double getRideTime() { return (getRideEnd() - getRideStart()) / 1000.0; }
 }

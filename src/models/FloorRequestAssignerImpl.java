@@ -3,8 +3,7 @@ package models;
 import gui.ElevatorDisplay.Direction;
 
 public class FloorRequestAssignerImpl implements FloorRequestAssigner {
-    public void addElevatorRequest(ElevatorRequest elevatorRequest, Person person) throws InvalidValueException {
-        ElevatorLogger.getInstance().logAction("Person " + person.getId() + " presses " + elevatorRequest.getDirection() + " button on Floor " + elevatorRequest.getFloorNumber());
+    public void assignElevatorRequest(ElevatorRequest elevatorRequest) throws InvalidValueException {
         ElevatorController elevatorController = ElevatorController.getInstance();
 
         int requestFloor = elevatorRequest.getFloorNumber();
