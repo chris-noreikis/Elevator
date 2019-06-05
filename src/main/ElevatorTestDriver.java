@@ -15,30 +15,16 @@ public class ElevatorTestDriver {
     private Random randomObject = new Random(1234);
 
     public void runTests() throws InterruptedException, InvalidValueException, ConfigurationException {
-//        testFour();
         partTwo();
+        printReport();
+        ElevatorDisplay.getInstance().shutdown();
+    }
 
+    private void printReport() throws InvalidValueException {
         SimulationReport report = new SimulationReport(people);
         report.printMaxMinWaitTimes();
         report.printRideLogs();
         report.printBuildingReport();
-        ElevatorDisplay.getInstance().shutdown();
-    }
-
-    private void testFour() throws InterruptedException, InvalidValueException {
-        for (int time = 0; time < 80; time++) {
-
-            if (time == 0) {
-                addPerson(1, 10);
-            }
-
-            if (time == 10) {
-                addPerson(8, 4);
-                addPerson(7, 3);
-            }
-
-            moveElevators(1000);
-        }
     }
 
     private void partTwo() throws InterruptedException, InvalidValueException, ConfigurationException {
