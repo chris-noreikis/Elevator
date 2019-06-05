@@ -24,7 +24,8 @@ public class ElevatorTestDriver {
         SimulationReport report = new SimulationReport(people);
         report.printMaxMinWaitTimes();
         report.printRideLogs();
-        report.printBuildingReport();
+
+        // report.printBuildingReport();
     }
 
     private void partTwo() throws InterruptedException, InvalidValueException, ConfigurationException {
